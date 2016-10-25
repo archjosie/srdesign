@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <cmath>
+#include <vector>
 #include <assert.h> //Enables use of assert function (VERY useful for debugs)
 
 #define PI 3.14159265
@@ -26,7 +27,7 @@ double snell(double thetaI, double n){
 
 void coeffs(double thetaT, double thetaI, double n){ 
 //We aren't returning anything on this function, so the return statement should be void (for now)
-
+    
     double refcofTE, refcofTM, transcofTE, transcofTM, refinTE, refinTM, transinTE, transinTM;
 	
 	//thetaI gets passed in degrees, so we need to fix that
