@@ -11,8 +11,6 @@
 
 #include<fftw3.h>
 
-using namespace std;
-
 class GaussianBeam {
 
 private:
@@ -31,8 +29,12 @@ public:
 	GaussianBeam();
 	GaussianBeam(double w0, double lambda, unsigned int m, unsigned int n);
 	void calculateGaussData();
-	void fourierTran(vector<vector<vector<double> > > realPart, vector<vector<vector<double> > > imagPart, vector<double> xVals, vector<double> yVals, ofstream & fout);
-	double distance(double x, double y);
+	void fourierTran(vector<vector<vector<double> > > realPart, vector<vector<vector<double> > > imagPart, vector<double> xVals, vector<double> yVals, ofstream &fout);
+	static double distance(double x, double y);
+	void setRealE(vector<vector<vector<double> > > realE);
+	void setImE(vector<vector<vector<double> > > imE);
+	void setRealFour(vector<vector<vector<double> > > realFour);
+	void setImFour(vector<vector<vector<double> > > imFour);
 };
 
 #endif

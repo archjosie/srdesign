@@ -1,4 +1,5 @@
 #include "GaussianBeam.h"
+
 const static double PI = 3.14159265;
 using namespace std;
 
@@ -177,7 +178,7 @@ void GaussianBeam::calculateGaussData() {
 	cout << "Data has been generated. Please enter name and format of file to be printed (.dat preferred): " << endl;
 	cin >> fileName;
 
-	fout.open(fileName.c_str());
+	fout.open(fileName);
 
 	if (fout.fail()) {
 		cerr << "Something went wrong! Exiting now..." << endl;
@@ -187,6 +188,7 @@ void GaussianBeam::calculateGaussData() {
 
 	if (choice == 3) {
 		fourierTran(ReEField, ImEField, xVals, yVals, fout);
+		fout.close();
 		return;
 	}
 
@@ -205,6 +207,7 @@ void GaussianBeam::calculateGaussData() {
 	}
 
 	cout << "Data output complete! Thank you for your business!" << endl;
+	fout.close();
 }
 
 void GaussianBeam::fourierTran(vector<vector<vector<double> > > realPart, vector<vector<vector<double> > > imagPart, vector<double> xVals, vector<double> yVals, ofstream &fout) {
