@@ -12,10 +12,11 @@ double snell(double n, double thetaIrad){
     double arg, thetaTrad; 
     arg = 1/n * sin(thetaIrad);
     thetaTrad = asin(arg);
+    return thetaTrad;
 }
 
 double refcofTE(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, refcofTE; 
+    double thetaTrad, thetaIrad, refcofTE; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     refcofTE = abs((cos(thetaIrad) - n*cos(thetaTrad))/(cos(thetaIrad) + n*cos(thetaTrad))); 
@@ -23,7 +24,7 @@ double refcofTE(double n,double thetaI){
 }
 
 double refinTE(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, refcofTE, refinTE; 
+    double thetaTrad, thetaIrad, refcofTE, refinTE; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     refcofTE = abs((cos(thetaIrad) - n*cos(thetaTrad))/(cos(thetaIrad) + n*cos(thetaTrad))); 
@@ -32,7 +33,7 @@ double refinTE(double n,double thetaI){
 }
 
 double transcofTE(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, transcofTE; 
+    double thetaTrad, thetaIrad, transcofTE; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     transcofTE = (2*cos(thetaIrad) /(cos(thetaIrad) + n*cos(thetaTrad)));
@@ -40,7 +41,7 @@ double transcofTE(double n,double thetaI){
 }
 
 double transinTE(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, transcofTE, transinTE; 
+    double thetaTrad, thetaIrad, transcofTE, transinTE; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     transcofTE = (2*cos(thetaIrad) /(cos(thetaIrad) + n*cos(thetaTrad)));
@@ -49,7 +50,7 @@ double transinTE(double n,double thetaI){
 }
 
 double refcofTM(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, refcofTM; 
+    double thetaTrad, thetaIrad, refcofTM; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     refcofTM = abs((cos(thetaTrad) - n*cos(thetaIrad))/(cos(thetaTrad) + n*cos(thetaIrad)));
@@ -57,7 +58,7 @@ double refcofTM(double n,double thetaI){
 }
 
 double refinTM(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, refcofTM, refinTM; 
+    double thetaTrad, thetaIrad, refcofTM, refinTM; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     refcofTM = abs((cos(thetaTrad) - n*cos(thetaIrad))/(cos(thetaTrad) + n*cos(thetaIrad)));
@@ -67,7 +68,7 @@ double refinTM(double n,double thetaI){
 
 
 double transcofTM(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, transcofTM; 
+    double thetaTrad, thetaIrad, transcofTM; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     transcofTM = (2*cos(thetaIrad) /(cos(thetaTrad) + n*cos(thetaIrad)));
@@ -75,7 +76,7 @@ double transcofTM(double n,double thetaI){
 }
 
 double transinTM(double n,double thetaI){
-    double arg, thetaTrad, thetaIrad, transcofTM, transinTM; 
+    double thetaTrad, thetaIrad, transcofTM, transinTM; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
     transcofTM = (2*cos(thetaIrad) /(cos(thetaTrad) + n*cos(thetaIrad)));
@@ -83,15 +84,15 @@ double transinTM(double n,double thetaI){
     return transinTM;
 }
 
-void wavenums(double n, double thetaI, vector<double> &kin, vector<double> &kref, vector<double> &ktran){
+void wavenums(double k, double n, double thetaI, vector<double> &kin, vector<double> &kref, vector<double> &ktran){
     double thetaIrad, thetaTrad; 
     thetaIrad = thetaI*PI/180;
     thetaTrad = snell(n, thetaIrad);
-
+    
     kin.push_back(sin(thetaIrad));
     kin.push_back(0);
     kin.push_back(cos(thetaIrad));
-
+    
     kref.push_back(-sin(thetaIrad));
     kref.push_back(0);
     kref.push_back(cos(thetaIrad));
@@ -102,7 +103,6 @@ void wavenums(double n, double thetaI, vector<double> &kin, vector<double> &kref
 }
 
 void coeffs(double n, double thetaI){ 
-    double thetaIrad = thetaI*PI/180;
     vector<double> kin, kref, ktran;
     wavenums(n, thetaI, kin, kref, ktran);
 	cout << "Transverse Electric Reflection Coefficient " <<    refcofTE(n,thetaI) << endl;
@@ -119,13 +119,15 @@ void coeffs(double n, double thetaI){
 }
 
 int main(){
-    double n, thetaI;
+    double n, thetaI, k;
 	//Other two variables were local variables we never use, so no need to declare them
 	
     cout << "Value of n" << endl;
     cin >> n;
     cout << "Incident Angle" << endl;
     cin >> thetaI;
+    cout << "Wave Number" << endl;
+    cin >> k;
 	
     coeffs(n, thetaI);
     return 0;
