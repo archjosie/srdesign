@@ -251,7 +251,7 @@ void GaussianBeam::fourierTran(vector<vector<vector<double> > > realPart, vector
 	cout << "Data output complete! Thank you for your business!" << endl;
 }
 
-void rootGraph(int argc, char** argv, vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double xMax, double xMin, double yMax, double yMin, double z){
+void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double xMax, double xMin, double yMax, double yMin, double z){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
     gStyle->SetOptStat(0);
