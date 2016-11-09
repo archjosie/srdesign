@@ -31,7 +31,6 @@
 #include <TMultiGraph.h>
 #include <TGraph2D.h>
 #include <TStyle.h>
-#include <TLegend.h>
 #include <TPad.h>
 #include <TAxis.h>
 #include <TF2.h>
@@ -60,7 +59,7 @@ void rootGraph(int argc, char** argv,vector<vector<vector<double> > > realSnap, 
 
 int main(int argc, char** argv) {
     
-	double lambda; //Stores wavelength of beam
+  	double lambda; //Stores wavelength of beam
 	cout << "Enter the wavelength of the Gaussian beam: " << endl;
 	cin >> lambda;
     
@@ -68,41 +67,41 @@ int main(int argc, char** argv) {
 	cout << "Enter the waist size of the Gaussian beam: " << endl;
 	cin >> w0;
     
-	double xMax; //Stores upper limit on x
-	cout << "Enter the maximum value of x: " << endl;
-	cin >> xMax;
-    
-	double xMin; //Stores upper limit on radius of consideration
-	cout << "Enter the minimum value of x: " << endl;
-	cin >> xMin;
-
-	double xInt; //Stores number of radial steps in the data output
-	cout << "Enter the step size on x: " << endl;
-	cin >> xInt;
-
-	double yMax; //Stores upper limit on radius of consideration
-	cout << "Enter the maximum value of y: " << endl;
-	cin >> yMax;
-
-	double yMin; //Stores upper limit on radius of consideration
-	cout << "Enter the minimum value of y: " << endl;
-	cin >> yMin;
-
-	double yInt; //Stores number of radial steps in the data output
-	cout << "Enter the step size on y: " << endl;
-	cin >> yInt;
-
-	double zMin; //Stores lower limit on distance from focus
-	cout << "Enter the minimum distance from focus: " << endl;
-	cin >> zMin;
-
-	double zMax; //Stores upper limit on distance from focus
-	cout << "Enter the maximum distance from focus: " << endl;
-	cin >> zMax;
-
-	double zInt; //Stores number of distance steps in the data output
-	cout << "Enter the step size on z: " << endl;
-	cin >> zInt;
+//	double xMax; //Stores upper limit on x
+//	cout << "Enter the maximum value of x: " << endl;
+//	cin >> xMax;
+//    
+//	double xMin; //Stores upper limit on radius of consideration
+//	cout << "Enter the minimum value of x: " << endl;
+//	cin >> xMin;
+//
+//	double xInt; //Stores number of radial steps in the data output
+//	cout << "Enter the step size on x: " << endl;
+//	cin >> xInt;
+//
+//	double yMax; //Stores upper limit on radius of consideration
+//	cout << "Enter the maximum value of y: " << endl;
+//	cin >> yMax;
+//
+//	double yMin; //Stores upper limit on radius of consideration
+//	cout << "Enter the minimum value of y: " << endl;
+//	cin >> yMin;
+//
+//	double yInt; //Stores number of radial steps in the data output
+//	cout << "Enter the step size on y: " << endl;
+//	cin >> yInt;
+//
+//	double zMin; //Stores lower limit on distance from focus
+//	cout << "Enter the minimum distance from focus: " << endl;
+//	cin >> zMin;
+//
+//	double zMax; //Stores upper limit on distance from focus
+//	cout << "Enter the maximum distance from focus: " << endl;
+//	cin >> zMax;
+//
+//	double zInt; //Stores number of distance steps in the data output
+//	cout << "Enter the step size on z: " << endl;
+//	cin >> zInt;
 
 	int n;
 	cout << "Enter angular momentum quantum number for y-direction: " << endl;
@@ -112,47 +111,47 @@ int main(int argc, char** argv) {
 	cout << "Enter angular momentum quantum number for x-direction: " << endl;
 	cin >> m;
 
-	vector<double> xVals;
-	vector<double> yVals;
-	vector<double> zVals; //Vectors to store input data
-
-	int xRange = (xMax - xMin) / xInt + 1;
-	int yRange = (yMax - yMin) / yInt + 1;
-	int zRange = (zMax - zMin) / zInt + 1; //"Hackfix" to get as close as possible to max without going over
-
-	for (int i = 0; i < xRange; i++) { //Populate xVals
-		double xCurr = xMin + i*xInt;
-		xVals.push_back(xCurr);
-	}
-
-	for (int i = 0; i < yRange; i++) { //Populate yVals
-		double yCurr = yMin + i*yInt;
-		yVals.push_back(yCurr);
-	}
-
-	for (int i = 0; i < zRange; i++) { //Populate zVals
-		double zCurr = i*zInt + zMin; //We don't want 0 in zVals
-		zVals.push_back(zCurr);
-	}
-
+//	vector<double> xVals;
+//	vector<double> yVals;
+//	vector<double> zVals; //Vectors to store input data
+//
+//	int xRange = (xMax - xMin) / xInt + 1;
+//	int yRange = (yMax - yMin) / yInt + 1;
+//	int zRange = (zMax - zMin) / zInt + 1; //"Hackfix" to get as close as possible to max without going over
+//
+//	for (int i = 0; i < xRange; i++) { //Populate xVals
+//		double xCurr = xMin + i*xInt;
+//		xVals.push_back(xCurr);
+//	}
+//
+//	for (int i = 0; i < yRange; i++) { //Populate yVals
+//		double yCurr = yMin + i*yInt;
+//		yVals.push_back(yCurr);
+//	}
+//
+//	for (int i = 0; i < zRange; i++) { //Populate zVals
+//		double zCurr = i*zInt + zMin; //We don't want 0 in zVals
+//		zVals.push_back(zCurr);
+//	}
+//
 	double k = lambda / (2 * PI); //Wave number for convenience
 	double zR = calculateRayleigh(w0, lambda); //Rayleigh range
-
-	vector<vector<vector<double> > > ReEField(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0)));
-	vector<vector<vector<double> > > ImEField(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
-
-	calculateGauss(ReEField, ImEField, xVals, yVals, zVals, k, zR, w0, m, n);
-
-	ofstream fout;
-	fout.open("gaussFieldCart.dat");
-	if (fout.fail()) {
-		cerr << "Something went wrong opening output file! Exiting..." << endl;
-		exit(1);
-	}
-
-	writeData(ReEField, ImEField, fout, xVals, yVals, zVals);
-	fout.close();
-
+//
+//	vector<vector<vector<double> > > ReEField(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0)));
+//	vector<vector<vector<double> > > ImEField(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
+//
+//	calculateGauss(ReEField, ImEField, xVals, yVals, zVals, k, zR, w0, m, n);
+//
+//	ofstream fout;
+//	fout.open("gaussFieldCart.dat");
+//	if (fout.fail()) {
+//		cerr << "Something went wrong opening output file! Exiting..." << endl;
+//		exit(1);
+//	}
+//
+//	writeData(ReEField, ImEField, fout, xVals, yVals, zVals);
+//	fout.close();
+//
 	snapshotWrite(argc, argv, k, w0, zR, m, n);
 
 	return 0;
@@ -237,27 +236,27 @@ void writeData(vector<vector<vector<double> > > ReEField, vector<vector<vector<d
 	cout << "Data output complete!" << endl;
 }
 
-void rootGraph(int argc, char** argv,vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double z){
+void rootGraph(int argc, char** argv, vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double xMax, double xMin, double yMax, double yMin, double z){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
+    gStyle->SetOptStat(0);
+//    gStyle->SetPalette(82);
     TCanvas *c1 = new TCanvas("c1","c1",600,400);
-    TH2F *hcontz = new TH2F("hcontz","Option CONTZ example ",40,-4,4,40,-20,20);
+    TH2F *hcontz = new TH2F("hcontz","Gaussian Beam Cross Section",40,xMin,xMax,40,yMin,yMax);
     Float_t px, py;
 	for (int i = 0; i < x.size(); ++i) {
 		for (int j = 0; j < y.size(); ++j) {
-				hcontz->Fill(x.at(i),y.at(j),realSnap.at(i).at(j).at(0));
+				hcontz->Fill(x.at(i),y.at(j),realSnap.at(i).at(j).at(z));
 		}
 	}
-//    hcontz->Draw("CONTZ");
-    hcontz->SetTitle("Cross Section of Gaussian Beam");
+//    hcontz->SetTitle("Cross Section of Gaussian Beam");
     hcontz->GetXaxis()->SetTitle("x"); 
     hcontz->GetYaxis()->SetTitle("y"); 
     hcontz->SetMarkerStyle(1);
     hcontz->GetXaxis()->CenterTitle(); 
     hcontz->GetYaxis()->CenterTitle(); 
-    gPad->GetListOfPrimitives()->Remove(hcontz);
-    //gStyle->SetPalette(82);
-    hcontz->Draw("SURF5");
+
+    hcontz->Draw("CONTZ");
     // Output PDF
     c1->Print("GBplots.pdf","pdf");
     theApp.Run();
@@ -337,7 +336,7 @@ void snapshotWrite(int argc, char** argv, double k, double w0, double zR, unsign
 		fout2.close();
 
 //int root(int argc, char *argv[],vector<vector<vector<double> > > ReEField, vector<double> x, vector<double> y, double z){
-        rootGraph(argc, argv, realSnap, xVals, yVals, z);
+        rootGraph(argc, argv, realSnap, xVals, yVals, xMax, xMin, yMax, yMin, z);
 
 		choice = 'a';
 		do {

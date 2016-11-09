@@ -35,6 +35,7 @@ public:
 	void setImE(vector<vector<vector<double> > > imE);
 	void setRealFour(vector<vector<vector<double> > > realFour);
 	void setImFour(vector<vector<vector<double> > > imFour);
-};
+
+    void rootGraph(int argc, char** argv, vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double xMax, double xMin, double yMax, double yMin, double z);
 
 #endif

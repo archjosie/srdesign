@@ -250,3 +250,31 @@ void GaussianBeam::fourierTran(vector<vector<vector<double> > > realPart, vector
 
 	cout << "Data output complete! Thank you for your business!" << endl;
 }
+
+void rootGraph(int argc, char** argv, vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double xMax, double xMin, double yMax, double yMin, double z){
+    //Open root graphics
+    TApplication theApp("App", &argc, argv);
+    gStyle->SetOptStat(0);
+//    gStyle->SetPalette(82);
+    TCanvas *c1 = new TCanvas("c1","c1",600,400);
+    TH2F *hcontz = new TH2F("hcontz","Gaussian Beam Cross Section",40,xMin,xMax,40,yMin,yMax);
+    Float_t px, py;
+	for (int i = 0; i < x.size(); ++i) {
+		for (int j = 0; j < y.size(); ++j) {
+				hcontz->Fill(x.at(i),y.at(j),realSnap.at(i).at(j).at(z));
+		}
+	}
+//    hcontz->SetTitle("Cross Section of Gaussian Beam");
+    hcontz->GetXaxis()->SetTitle("x"); 
+    hcontz->GetYaxis()->SetTitle("y"); 
+    hcontz->SetMarkerStyle(1);
+    hcontz->GetXaxis()->CenterTitle(); 
+    hcontz->GetYaxis()->CenterTitle(); 
+
+    hcontz->Draw("CONTZ");
+    // Output PDF
+    c1->Print("GBplots.pdf","pdf");
+    theApp.Run();
+    
+    return;
+}
