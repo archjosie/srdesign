@@ -238,7 +238,7 @@ void writeData(vector<vector<vector<double> > > ReEField, vector<vector<vector<d
 
 void rootGraph(int argc, char** argv, vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double xMax, double xMin, double yMax, double yMin, double z){
     //Open root graphics
-    TApplication theApp("App", &argc, argv);
+    TApplication theApp("App", &argc, &argv);
     gStyle->SetOptStat(0);
 //    gStyle->SetPalette(82);
     TCanvas *c1 = new TCanvas("c1","c1",600,400);

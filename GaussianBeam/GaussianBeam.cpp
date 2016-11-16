@@ -1,6 +1,7 @@
 #include "GaussianBeam.h"
 
-const static double PI = 3.14159265;
+
+//const static double PI = 3.14159265;
 using namespace std;
 
 GaussianBeam::GaussianBeam() {
@@ -9,17 +10,18 @@ GaussianBeam::GaussianBeam() {
 	m = 0;
 	n = 0;
 
-	k = 2 * PI / lambda;
+	k = 2 * 3.14159265 / lambda;
 	zR = calculateRayleigh();
+    cout << "hello world" << endl;
 }
 
 GaussianBeam::GaussianBeam(double w0, double lambda, unsigned int m, unsigned int n) {
-	this->w0 = w0;
+    this->w0 = w0;
 	this->lambda = lambda;
 	this->m = m;
 	this->n = n;
 
-	this->k = 2 * PI / lambda;
+	this->k = 2 * 3.14159265 / lambda;
 	this->zR = calculateRayleigh();
 }
 
@@ -40,7 +42,7 @@ double GaussianBeam::calculateWaist(double z) {
 }
 
 double GaussianBeam::calculateRayleigh() {
-	return PI * pow(w0, 2) / lambda;
+	return 3.14159265 * pow(w0, 2) / lambda;
 }
 
 double GaussianBeam::calculateHermite(double x, unsigned int m) { //Calculates the nth Hermite polynomial evaluated at x recursively
@@ -70,32 +72,23 @@ void GaussianBeam::calculateGaussData() {
 		}
 	} while (!choiceMade);
 
-	double xMax; //Stores upper limit on x
 	cout << "Enter the maximum value of x: " << endl;
 	cin >> xMax;
 
-	double xMin; //Stores upper limit on radius of consideration
 	cout << "Enter the minimum value of x: " << endl;
 	cin >> xMin;
 
-	double xInt; //Stores number of radial steps in the data output
 	cout << "Enter the step size on x: " << endl;
 	cin >> xInt;
 
-	double yMax; //Stores upper limit on radius of consideration
 	cout << "Enter the maximum value of y: " << endl;
 	cin >> yMax;
 
-	double yMin; //Stores upper limit on radius of consideration
 	cout << "Enter the minimum value of y: " << endl;
 	cin >> yMin;
 
-	double yInt; //Stores number of radial steps in the data output
 	cout << "Enter the step size on y: " << endl;
 	cin >> yInt;
-
-	vector<double> xVals;
-	vector<double> yVals;
 
 	int xRange = (xMax - xMin) / xInt + 1;
 	int yRange = (yMax - yMin) / yInt + 1;
@@ -110,19 +103,14 @@ void GaussianBeam::calculateGaussData() {
 		yVals.push_back(yCurr);
 	}
 
-	vector<double> zVals;
-
 	if (choice == 1) {
 
-		double zMin; //Stores lower limit on distance from focus
 		cout << "Enter the minimum distance from focus: " << endl;
 		cin >> zMin;
 
-		double zMax; //Stores upper limit on distance from focus
 		cout << "Enter the maximum distance from focus: " << endl;
 		cin >> zMax;
 
-		double zInt; //Stores number of distance steps in the data output
 		cout << "Enter the step size on z: " << endl;
 		cin >> zInt;
 
@@ -144,8 +132,10 @@ void GaussianBeam::calculateGaussData() {
 		zVals.push_back(theZ);
 	}
 
-	vector<vector<vector<double> > > ReEField(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0)));
-	vector<vector<vector<double> > > ImEField(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
+	vector<vector<vector<double> > > ReLocal(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
+
+    ReEField = ReLocal;
+    ImEField = ReLocal;
 
 	for (int l = 0; l < zVals.size(); ++l) {  //Weird choice, but this streamlines the program
 										  //These only vary with z, so we only need to calculate them once per loop
@@ -158,7 +148,7 @@ void GaussianBeam::calculateGaussData() {
 
 				double r = distance(xVals.at(i), yVals.at(j));
 				//Complex argument for Gaussian E-field
-
+                
 				double imArg = -(k* zVals.at(l) + k*(pow(r, 2) / (radCurv * 2)) - gouy);
 				complex<double> expArg(0.0, imArg);
 
@@ -178,7 +168,7 @@ void GaussianBeam::calculateGaussData() {
 	cout << "Data has been generated. Please enter name and format of file to be printed (.dat preferred): " << endl;
 	cin >> fileName;
 
-	fout.open(fileName);
+	fout.open(fileName.c_str());
 
 	if (fout.fail()) {
 		cerr << "Something went wrong! Exiting now..." << endl;
@@ -251,17 +241,17 @@ void GaussianBeam::fourierTran(vector<vector<vector<double> > > realPart, vector
 	cout << "Data output complete! Thank you for your business!" << endl;
 }
 
-void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > realSnap, vector<double> x, vector<double> y, double xMax, double xMin, double yMax, double yMin, double z){
+void GaussianBeam::rootGraph(int argc, char** argv, unsigned int zsteps){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
     gStyle->SetOptStat(0);
 //    gStyle->SetPalette(82);
-    TCanvas *c1 = new TCanvas("c1","c1",600,400);
+    TCanvas *c1 = new TCanvas("c1","c1",600,600);
     TH2F *hcontz = new TH2F("hcontz","Gaussian Beam Cross Section",40,xMin,xMax,40,yMin,yMax);
     Float_t px, py;
-	for (int i = 0; i < x.size(); ++i) {
-		for (int j = 0; j < y.size(); ++j) {
-				hcontz->Fill(x.at(i),y.at(j),realSnap.at(i).at(j).at(z));
+	for (int i = 0; i < xVals.size(); ++i) {
+		for (int j = 0; j < yVals.size(); ++j) {
+				hcontz->Fill(xVals.at(i),yVals.at(j),ReEField.at(i).at(j).at(zsteps));
 		}
 	}
 //    hcontz->SetTitle("Cross Section of Gaussian Beam");
@@ -270,11 +260,9 @@ void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double>
     hcontz->SetMarkerStyle(1);
     hcontz->GetXaxis()->CenterTitle(); 
     hcontz->GetYaxis()->CenterTitle(); 
-
+    
     hcontz->Draw("CONTZ");
     // Output PDF
     c1->Print("GBplots.pdf","pdf");
     theApp.Run();
-    
-    return;
 }
