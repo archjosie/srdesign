@@ -60,6 +60,11 @@ public:
 	void setImE(vector<vector<vector<double> > > imE);
 	void setRealFour(vector<vector<vector<double> > > realFour);
 	void setImFour(vector<vector<vector<double> > > imFour);
+	vector<vector<vector<double> > > getRealE();
+	vector<vector<vector<double> > > getImE();
+	vector<double> getXVals();
+	vector<double> getYVals();
+	double getK();
     
     void rootGraph(int argc, char** argv, unsigned int zsteps);
 };

@@ -241,6 +241,31 @@ void GaussianBeam::fourierTran(vector<vector<vector<double> > > realPart, vector
 	cout << "Data output complete! Thank you for your business!" << endl;
 }
 
+vector<vector<vector<double>>> GaussianBeam::getRealE()
+{
+	return ReEField;
+}
+
+vector<vector<vector<double>>> GaussianBeam::getImE()
+{
+	return ImEField;
+}
+
+vector<double> GaussianBeam::getXVals()
+{
+	return xVals;
+}
+
+vector<double> GaussianBeam::getYVals()
+{
+	return yVals;
+}
+
+double GaussianBeam::getK()
+{
+	return k;
+}
+
 void GaussianBeam::rootGraph(int argc, char** argv, unsigned int zsteps){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
