@@ -10,9 +10,12 @@ GaussianBeam::GaussianBeam() {
 	m = 0;
 	n = 0;
 
-	k = 2 * 3.14159265 / lambda;
-	zR = calculateRayleigh();
-    cout << "hello world" << endl;
+	vector<vector<vector<double> > > local(1, vector<vector<double> >(1, vector<double>(1, 0)));
+	this->ReEField = local;
+	this->ImEField = local;
+
+	this->k = 2 * 3.14159265 / lambda;
+	this->zR = calculateRayleigh();
 }
 
 GaussianBeam::GaussianBeam(double w0, double lambda, unsigned int m, unsigned int n) {
@@ -20,6 +23,10 @@ GaussianBeam::GaussianBeam(double w0, double lambda, unsigned int m, unsigned in
 	this->lambda = lambda;
 	this->m = m;
 	this->n = n;
+
+	vector<vector<vector<double> > > local(1, vector<vector<double> >(1, vector<double>(1, 0)));
+	this->ReEField = local;
+	this->ImEField = local;
 
 	this->k = 2 * 3.14159265 / lambda;
 	this->zR = calculateRayleigh();
