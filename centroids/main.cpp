@@ -129,7 +129,7 @@ int main(int argc, char** argv){
     //Generate the kapa table (using the step size found in the mathematica nb "Single interface Shifts")
 	
     //vector<double> kXVals, kYVals; This Declaration wasn't being used... Don't know if we need it.
-	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
+	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
@@ -144,10 +144,10 @@ int main(int argc, char** argv){
     //we generate the eR table.
     //NOTE: May be able to compress
 
-	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
+	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
-	for (int i = 0; i < beam1.getRealE.size(); i++) {
-		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
+	for (int i = 0; i < beam1.getRealE().size(); i++) {
+		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			eRTab.at(i).at(j).at(0) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(0);
 			eRTab.at(i).at(j).at(1) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(1);
 			eRTab.at(i).at(j).at(2) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(2);
@@ -157,10 +157,10 @@ int main(int argc, char** argv){
     //Now we can use the eRtab and the fourier data "out" (E$Tilde in the
     //mathematica notebook) to generate ERtab
 
-	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
+	vector<vector<vector<complex<double> > > > ERTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
-/*	for (int i = 0; i < beam1.getRealE.size(); i++) {
-		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
+/*	for (int i = 0; i < beam1.getRealE().size(); i++) {
+		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * //Neet a complex vector that contains fourier data to multiply by 
 			ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * //Neet a complex vector that contains fourier data to multiply by
 			ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * //Neet a complex vector that contains fourier data to multiply by
