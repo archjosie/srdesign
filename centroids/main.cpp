@@ -1,10 +1,8 @@
 #include "GaussianBeam.h"
 
-#include<complex>
-#include<cmath>
-
 const static double PI = 3.14159265;
 const static double NGLASS = 1.3;
+const static double THETA = 30.0;
 using namespace std;
 
 double snell(double n, double thetaIrad) {
@@ -72,12 +70,14 @@ int main(int argc, char** argv){
     GaussianBeam beam1(1.0,.01,1,0);
     beam1.calculateGaussData();
     //If we're only worrying about the interface we need to pick option 2
-    //Flatten to 2D at a specific z   
+    //(Basically a 2d, 3d vector)
 
+    //Generate the input and output vectors for fftw
 	fftw_complex *in, *out;
 	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 	out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 
+    //Create plane for forward transform
 	fftw_plan g = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	int k = 0;
@@ -89,10 +89,23 @@ int main(int argc, char** argv){
 		}
 	}
 
+    //Do forward forier transform. Results are stored in "out"
 	fftw_execute(g);
 
-	vector<vector<vector<double> > > ReFour(beam1.getRealE.size(), vector<vector<double> >(beam1.getRealE.at(0).size(), vector<double>(1, 0)));
+    //Seperate the real and imaginart parts of the fourier data (I don't know if
+    //we need to do this)	
+    vector<vector<vector<double> > > ReFour(beam1.getRealE.size(), vector<vector<double> >(beam1.getRealE.at(0).size(), vector<double>(1, 0)));
 	vector<vector<vector<double> > > ImFour(beam1.getRealE.size(), vector<vector<double> >(beam1.getRealE.at(0).size(), vector<double>(1, 0)));
+	vector<vector<vector<complex<double> > > > FourData(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(1, complex<double>(0, 0))));
+
+	//k = 0;
+	//for (int i = 0; i < beam1.getRealE().size(); i++) {
+	//	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
+	//		ReFour.at(i).at(j).at(0) = out[k][0];
+	//		ImFour.at(i).at(j).at(0) = out[k][1];
+	//		k++;
+	//	}
+	//}
 
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
@@ -103,13 +116,20 @@ int main(int argc, char** argv){
 		}
 	}
 
-	double refTE = refinTE(1.3, 30);
-	double refTM = refinTM(1.3, 30);
+    //Define reflection coefficients for TE and TM
+    double refTE = refinTE(NGLASS, THETA);
+	double refTM = refinTM(NGLASS, THETA);
 
-	//Assuming horizontal polarization. According to Centroid Shifts paper, f1 = 1, f2 = 0
+	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
+    vector<complex<int> > fVec(3, complex<int>(0, 0));
+    fVec.at(0)=1;
+    fVec.at(1)=0;
+    fVec.at(2)=0;
 
-	vector<double> kXVals, kYVals;
-	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
+    //Generate the kapa table (using the step size found in the mathematica nb "Single interface Shifts")
+	
+    //vector<double> kXVals, kYVals; This Declaration wasn't being used... Don't know if we need it.
+	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
 	for (int i = 0; i < beam1.getRealE.size(); i++) {
 		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
@@ -119,11 +139,36 @@ int main(int argc, char** argv){
 		}
 	}
 
+    //From the Mathematica code:
+    //eRtab = Table[eR /. {\[Kappa]x -> \[Kappa]tab[[i, j]][[1]], \[Kappa]y -> \[Kappa]tab[[i, j]][[2]]} /. params$here, {i, 1, dimset}, {j, 1, dimset}];
+    //we generate the eR table.
+    //NOTE: May be able to compress
 
+	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
 
-	fftw_plan h = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
-
+	for (int i = 0; i < beam1.getRealE.size(); i++) {
+		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
+			eRTab.at(i).at(j).at(0) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(0);
+			eRTab.at(i).at(j).at(1) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(1);
+			eRTab.at(i).at(j).at(2) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(2);
+		}
+	}
 	
-    beam1.rootGraph(argc, argv, 0);
+    //Now we can use the eRtab and the fourier data "out" (E$Tilde in the
+    //mathematica notebook) to generate ERtab
+
+	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
+
+	for (int i = 0; i < beam1.getRealE.size(); i++) {
+		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
+			ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * //Neet a complex vector that contains fourier data to multiply by 
+			ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * //Neet a complex vector that contains fourier data to multiply by
+			ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * //Neet a complex vector that contains fourier data to multiply by
+		}
+	}
+        
+    fftw_plan h = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
+	
+//    beam1.rootGraph(argc, argv, 0);
     return 0;
 }
