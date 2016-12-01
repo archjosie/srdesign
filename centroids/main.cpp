@@ -56,7 +56,7 @@ double findMax(vector<double> vals) {
 	return max;
 }
 
-vector<complex<double> > ETildeBase (vector<complex<int> > f, double theta, vector<complex<double> > kVecs) {
+vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, vector<complex<double> > kVecs) {
 	vector<complex<double> > theVec(3, complex<double> (0,0));
 
 	theVec.at(0) = f.at(0)*refinTM(NGLASS, theta) - f.at(1)*kVecs.at(0)*cot(theta)*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
@@ -121,7 +121,7 @@ int main(int argc, char** argv){
 	double refTM = refinTM(NGLASS, THETA);
 
 	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
-    vector<complex<int> > fVec(3, complex<int>(0, 0));
+    vector<complex<double> > fVec(3, complex<double>(0, 0));
     fVec.at(0)=1;
     fVec.at(1)=0;
     fVec.at(2)=0;
@@ -159,14 +159,14 @@ int main(int argc, char** argv){
 
 	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
 
-	for (int i = 0; i < beam1.getRealE.size(); i++) {
+/*	for (int i = 0; i < beam1.getRealE.size(); i++) {
 		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
 			ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * //Neet a complex vector that contains fourier data to multiply by 
 			ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * //Neet a complex vector that contains fourier data to multiply by
 			ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * //Neet a complex vector that contains fourier data to multiply by
 		}
 	}
-        
+ */       
     fftw_plan h = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
 	
 //    beam1.rootGraph(argc, argv, 0);
