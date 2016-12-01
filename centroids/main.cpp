@@ -94,9 +94,9 @@ int main(int argc, char** argv){
 
     //Seperate the real and imaginart parts of the fourier data (I don't know if
     //we need to do this)	
-    vector<vector<vector<double> > > ReFour(beam1.getRealE.size(), vector<vector<double> >(beam1.getRealE.at(0).size(), vector<double>(1, 0)));
-	vector<vector<vector<double> > > ImFour(beam1.getRealE.size(), vector<vector<double> >(beam1.getRealE.at(0).size(), vector<double>(1, 0)));
-	vector<vector<vector<complex<double> > > > FourData(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(1, complex<double>(0, 0))));
+    vector<vector<vector<double> > > ReFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
+	vector<vector<vector<double> > > ImFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
+	vector<vector<vector<complex<double> > > > FourData(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(1, complex<double>(0, 0))));
 
 	//k = 0;
 	//for (int i = 0; i < beam1.getRealE().size(); i++) {
@@ -131,11 +131,11 @@ int main(int argc, char** argv){
     //vector<double> kXVals, kYVals; This Declaration wasn't being used... Don't know if we need it.
 	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
-	for (int i = 0; i < beam1.getRealE.size(); i++) {
-		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
-			kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE.size(), beam1.getK(), findMax(beam1.getXVals()));
-			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE.at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
-			kPerpTab.at(i).at(j).at(2) = sqrt(1-pow(generateK(j, beam1.getRealE.at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE.size(), beam1.getK(), findMax(beam1.getXVals())), 2));
+	for (int i = 0; i < beam1.getRealE().size(); i++) {
+		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
+			kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals()));
+			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
+			kPerpTab.at(i).at(j).at(2) = sqrt(1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2));
 		}
 	}
 
@@ -144,7 +144,7 @@ int main(int argc, char** argv){
     //we generate the eR table.
     //NOTE: May be able to compress
 
-	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
+	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
 
 	for (int i = 0; i < beam1.getRealE.size(); i++) {
 		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
@@ -157,7 +157,7 @@ int main(int argc, char** argv){
     //Now we can use the eRtab and the fourier data "out" (E$Tilde in the
     //mathematica notebook) to generate ERtab
 
-	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE.size(), vector<vector<complex<double> > >(beam1.getRealE.at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
+	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0)));
 
 /*	for (int i = 0; i < beam1.getRealE.size(); i++) {
 		for (int j = 0; j < beam1.getRealE.at(0).size(); j++) {
