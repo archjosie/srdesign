@@ -59,8 +59,8 @@ double findMax(vector<double> vals) {
 vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, vector<complex<double> > kVecs) {
 	vector<complex<double> > theVec(3, complex<double> (0,0));
 
-	theVec.at(0) = f.at(0)*refinTM(NGLASS, theta) - f.at(1)*kVecs.at(0)*cot(theta)*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
-	theVec.at(1) = f.at(1)*refinTE(NGLASS, theta) + f.at(0)*kVecs.at(1)*cot(theta)*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
+	theVec.at(0) = f.at(0)*refinTM(NGLASS, theta) - f.at(1)*kVecs.at(0)*(1 / tan(theta*PI/180))*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
+	theVec.at(1) = f.at(1)*refinTE(NGLASS, theta) + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
 	theVec.at(2) = -f.at(0)*refinTM(NGLASS, theta)*kVecs.at(0) - f.at(1)*refinTE(NGLASS, theta)*kVecs.at(1);
 
 	return theVec;

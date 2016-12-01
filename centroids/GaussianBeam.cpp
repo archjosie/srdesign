@@ -241,12 +241,12 @@ void GaussianBeam::fourierTran(vector<vector<vector<double> > > realPart, vector
 	cout << "Data output complete! Thank you for your business!" << endl;
 }
 
-vector<vector<vector<double>>> GaussianBeam::getRealE()
+vector<vector<vector<double> > > GaussianBeam::getRealE()
 {
 	return ReEField;
 }
 
-vector<vector<vector<double>>> GaussianBeam::getImE()
+vector<vector<vector<double> > > GaussianBeam::getImE()
 {
 	return ImEField;
 }
