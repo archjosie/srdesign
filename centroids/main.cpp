@@ -110,8 +110,8 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			ReFour.at(i).at(j).at(0) = out[k][0];
-			ImFour.at(i).at(j).at(0) = out[k][1];
+			complex<double> fourEnt(out[k][0], out[k][1]);
+			FourData.at(i).at(j).at(0) = fourEnt;
 			k++;
 		}
 	}
