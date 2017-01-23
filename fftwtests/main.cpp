@@ -1,3 +1,5 @@
+// Work on units using use the notebook on the drive
+
 #include "GaussianBeam.h"
 
 const static double PI = 3.14159265;
@@ -59,7 +61,8 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < sizeX; i++) {
 		for (int j = 0; j < sizeY; j++) {
-			outVec.at(i).at(j) = out[k][0];
+    //      change this to abs of the complex number
+            outVec.at(i).at(j) = out[k][0];
             xVals.at(i) = sin (10*PI/sizeX*i);
             yVals.at(j) = sin (10*PI/sizeY*j);
     //		ImFour.at(i).at(j).at(0) = out[k][1];
