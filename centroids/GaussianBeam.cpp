@@ -273,7 +273,7 @@ double GaussianBeam::getK()
 	return k;
 }
 
-void GaussianBeam::rootGraph(int argc, char** argv, unsigned int zsteps){
+void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<double> > Field){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
     gStyle->SetOptStat(0);
@@ -283,7 +283,7 @@ void GaussianBeam::rootGraph(int argc, char** argv, unsigned int zsteps){
     Float_t px, py;
 	for (int i = 0; i < xVals.size(); ++i) {
 		for (int j = 0; j < yVals.size(); ++j) {
-				hcontz->Fill(xVals.at(i),yVals.at(j),ReEField.at(i).at(j).at(zsteps));
+				hcontz->Fill(xVals.at(i),yVals.at(j),Field.at(i).at(j));
 		}
 	}
 //    hcontz->SetTitle("Cross Section of Gaussian Beam");

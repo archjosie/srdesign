@@ -73,7 +73,7 @@ int main(int argc, char** argv){
     //(Basically a 2d, 3d vector)
 
     //Generate the input and output vectors for fftw
-	fftw_complex *in, *out;
+	fftw_complex *in, *out, *in2, *out2;
 	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 	out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 
@@ -94,8 +94,8 @@ int main(int argc, char** argv){
 
     //Seperate the real and imaginart parts of the fourier data (I don't know if
     //we need to do this)	
-    vector<vector<vector<double> > > ReFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
-	vector<vector<vector<double> > > ImFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
+    //vector<vector<vector<double> > > ReFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
+	//vector<vector<vector<double> > > ImFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
 	vector<vector<vector<complex<double> > > > FourData(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(1, complex<double>(0, 0))));
 
 	//k = 0;
@@ -115,6 +115,8 @@ int main(int argc, char** argv){
 			k++;
 		}
 	}
+
+    cout << "Fourier Data Generated" << endl;
 
     //Define reflection coefficients for TE and TM
     double refTE = refinTE(NGLASS, THETA);
@@ -139,6 +141,8 @@ int main(int argc, char** argv){
 		}
 	}
 
+    cout << "kappa table generated" << endl;
+
     //From the Mathematica code:
     //eRtab = Table[eR /. {\[Kappa]x -> \[Kappa]tab[[i, j]][[1]], \[Kappa]y -> \[Kappa]tab[[i, j]][[2]]} /. params$here, {i, 1, dimset}, {j, 1, dimset}];
     //we generate the eR table.
@@ -159,16 +163,61 @@ int main(int argc, char** argv){
 
 	vector<vector<vector<complex<double> > > > ERTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
-/*	for (int i = 0; i < beam1.getRealE().size(); i++) {
-		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * //Neet a complex vector that contains fourier data to multiply by 
-			ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * //Neet a complex vector that contains fourier data to multiply by
-			ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * //Neet a complex vector that contains fourier data to multiply by
+    for (int i = 0; i < beam1.getRealE().size(); i++) {
+    	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
+    		ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * FourData.at(i).at(j).at(0);
+    		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * FourData.at(i).at(j).at(0);
+    		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * FourData.at(i).at(j).at(0);
+    	}
+    }
+          
+    cout << "ERTab generated, process complete" << endl;
+
+	in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
+	out2 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
+    
+    k = 0;
+    for (int i = 0; i < ERTab.size(); i++) {
+        for (int j = 0; j < ERTab.at(0).size(); j++) {
+            in2[k][0] = ERTab.at(i).at(j).at(0).real();
+            in2[k][1] = ERTab.at(i).at(j).at(0).imag();
+        }    
+    }
+
+    fftw_plan h = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), in2, out2, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_execute(h);
+
+    vector<vector<complex<double> > > outBeam(ERTab.size(), vector<complex<double> >(ERTab.at(0).size(), complex<double> (0,0)));
+    vector<vector<double > > REoutBeam(ERTab.size(), vector<double> (ERTab.at(0).size(), 0));
+	
+	k = 0;
+	for (int i = 0; i < ERTab.size(); i++) {
+		for (int j = 0; j < ERTab.at(0).size(); j++) {
+			complex<double> fourEnt(out[k][0], out[k][1]);
+			outBeam.at(i).at(j) = fourEnt; 
+			k++;
 		}
 	}
- */       
-    fftw_plan h = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
-	
-//    beam1.rootGraph(argc, argv, 0);
+
+	k = 0;
+	for (int i = 0; i < ERTab.size(); i++) {
+		for (int j = 0; j < ERTab.at(0).size(); j++) {
+			double REfourEnt = out[k][0];
+			REoutBeam.at(i).at(j) = REfourEnt; 
+			k++;
+		}
+	}
+
+    cout << "Output beam constructed." << endl;
+
+    fftw_free(in);
+    fftw_free(out);
+    fftw_free(in2);
+    fftw_free(out2);
+
+    fftw_destroy_plan(h);
+    fftw_destroy_plan(g);
+
+    beam1.rootGraph(argc, argv, outBeam);
     return 0;
 }
