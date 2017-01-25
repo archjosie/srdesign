@@ -292,8 +292,9 @@ void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double>
     hcontz->SetMarkerStyle(1);
     hcontz->GetXaxis()->CenterTitle(); 
     hcontz->GetYaxis()->CenterTitle(); 
-    
-    hcontz->Draw("CONTZ");
+    hcontz->SetMaximum(4);
+    hcontz->SetMinimum(0);    
+    hcontz->Draw("CONT1z");
     // Output PDF
     c1->Print("GBplots.pdf","pdf");
     theApp.Run();

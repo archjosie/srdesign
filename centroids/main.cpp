@@ -59,7 +59,7 @@ double findMax(vector<double> vals) {
 vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, vector<complex<double> > kVecs) {
 	vector<complex<double> > theVec(3, complex<double> (0,0));
 
-	theVec.at(0) = f.at(0)*refinTM(NGLASS, theta) - f.at(1)*kVecs.at(0)*(1 / tan(theta*PI/180))*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
+	theVec.at(0) = f.at(0)*refinTM(NGLASS, theta) - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
 	theVec.at(1) = f.at(1)*refinTE(NGLASS, theta) + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
 	theVec.at(2) = -f.at(0)*refinTM(NGLASS, theta)*kVecs.at(0) - f.at(1)*refinTE(NGLASS, theta)*kVecs.at(1);
 
@@ -92,20 +92,7 @@ int main(int argc, char** argv){
     //Do forward forier transform. Results are stored in "out"
 	fftw_execute(g);
 
-    //Seperate the real and imaginart parts of the fourier data (I don't know if
-    //we need to do this)	
-    //vector<vector<vector<double> > > ReFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
-	//vector<vector<vector<double> > > ImFour(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double>(1, 0)));
 	vector<vector<vector<complex<double> > > > FourData(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(1, complex<double>(0, 0))));
-
-	//k = 0;
-	//for (int i = 0; i < beam1.getRealE().size(); i++) {
-	//	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-	//		ReFour.at(i).at(j).at(0) = out[k][0];
-	//		ImFour.at(i).at(j).at(0) = out[k][1];
-	//		k++;
-	//	}
-	//}
 
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
@@ -129,8 +116,6 @@ int main(int argc, char** argv){
     fVec.at(2)=0;
 
     //Generate the kapa table (using the step size found in the mathematica nb "Single interface Shifts")
-	
-    //vector<double> kXVals, kYVals; This Declaration wasn't being used... Don't know if we need it.
 	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
@@ -190,12 +175,13 @@ int main(int argc, char** argv){
 	vector<vector<vector<complex<double> > > > outBeam(ERTab.size(), vector<vector<complex<double> > >(ERTab.at(0).size(), vector<complex<double> > (1, complex<double> (0,0))));
     vector<vector<vector<double> > > REoutBeam(ERTab.size(), vector<vector<double> > (ERTab.at(0).size(), vector<double> (1,0)));
 	vector<vector<vector<double> > > outBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
-	
+	vector<vector<vector<double> > > OGBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
+
 	k = 0;
 	for (int i = 0; i < ERTab.size(); i++) {
 		for (int j = 0; j < ERTab.at(0).size(); j++) {
 			complex<double> fourEnt(out[k][0], out[k][1]);
-			outBeam.at(i).at(j) = fourEnt; 
+			outBeam.at(i).at(j).at(0) = fourEnt; 
 			k++;
 		}
 	}
@@ -219,16 +205,11 @@ int main(int argc, char** argv){
     fftw_destroy_plan(h);
     fftw_destroy_plan(g);
 
- /*   for (int i = 0; i < REoutBeam.size(); i++) {
-        for (int j = 0; j < REoutBeam.at(0).size(); j++) {
-            cout << REoutBeam.at(i).at(j).at(0) << "\t";
-        }
-        cout << endl;
-    }
-*/
+	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
+		outBeamMag.at(i).at(j).at(0) = sqrt(real(outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0))));
 
 	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
-		outBeamMag.at(i).at(j).at(0) = outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0));
+		OGBeamMag.at(i).at(j).at(0) = sqrt(pow(beam1.getRealE().at(i).at(j).at(0),2) + pow(beam1.getImE().at(i).at(j).at(0),2));
 
 	double nXrp1 = 0, nYrp1 = 0, denom = 0;
 	
@@ -245,7 +226,7 @@ int main(int argc, char** argv){
 
 	//TODO: Do something about the centroid shift #s, why chop in Mathematica??
 
-//    beam1.rootGraph(argc, argv, beam1.getRealE());
-    beam1.rootGraph(argc, argv, REoutBeam);
+//    beam1.rootGraph(argc, argv, OGBeamMag);
+    beam1.rootGraph(argc, argv, outBeamMag);
     return 0;
 }
