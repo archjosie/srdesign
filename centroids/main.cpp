@@ -187,8 +187,9 @@ int main(int argc, char** argv){
     fftw_plan h = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), in2, out2, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(h);
 
-    vector<vector<complex<double> > > outBeam(ERTab.size(), vector<complex<double> >(ERTab.at(0).size(), complex<double> (0,0)));
-    vector<vector<vector<double > > > REoutBeam(ERTab.size(), vector<vector<double> > (ERTab.at(0).size(), vector<double> (1,0)));
+	vector<vector<vector<complex<double> > > > outBeam(ERTab.size(), vector<vector<complex<double> > >(ERTab.at(0).size(), vector<complex<double> > (1, complex<double> (0,0))));
+    vector<vector<vector<double> > > REoutBeam(ERTab.size(), vector<vector<double> > (ERTab.at(0).size(), vector<double> (1,0)));
+	vector<vector<vector<double> > > outBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
 	
 	k = 0;
 	for (int i = 0; i < ERTab.size(); i++) {
@@ -218,12 +219,31 @@ int main(int argc, char** argv){
     fftw_destroy_plan(h);
     fftw_destroy_plan(g);
 
-    for (int i = 0; i < REoutBeam.size(); i++) {
+ /*   for (int i = 0; i < REoutBeam.size(); i++) {
         for (int j = 0; j < REoutBeam.at(0).size(); j++) {
             cout << REoutBeam.at(i).at(j).at(0) << "\t";
         }
         cout << endl;
     }
+*/
+
+	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
+		outBeamMag.at(i).at(j).at(0) = outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0));
+
+	double nXrp1 = 0, nYrp1 = 0, denom = 0;
+	
+	for (int i = 0; i < outBeamMag.size(); i++) {
+		for (int j = 0; j < outBeamMag.at(0).size(); j++) {
+			nXrp1 += j * outBeamMag.at(i).at(j).at(0);
+			nYrp1 += i * outBeamMag.at(i).at(j).at(0);
+			denom += outBeamMag.at(i).at(j).at(0);
+		}
+	}
+
+	double nXr = nXrp1 / denom;
+	double nYr = nYrp1 / denom;
+
+	//TODO: Do something about the centroid shift #s, why chop in Mathematica??
 
 //    beam1.rootGraph(argc, argv, beam1.getRealE());
     beam1.rootGraph(argc, argv, REoutBeam);
