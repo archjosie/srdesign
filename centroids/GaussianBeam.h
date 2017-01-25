@@ -66,7 +66,7 @@ public:
 	vector<double> getYVals();
 	double getK();
     
-    void rootGraph(int argc, char** argv,vector<vector<vector<double> > > Field);
+    void rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field);
 };
 
 #endif

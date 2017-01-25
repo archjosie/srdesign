@@ -67,7 +67,7 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 }
 
 int main(int argc, char** argv){
-    GaussianBeam beam1(1.0,.01,1,0);
+    GaussianBeam beam1(1.0,.01,0,0);
     beam1.calculateGaussData();
     //If we're only worrying about the interface we need to pick option 2
     //(Basically a 2d, 3d vector)
@@ -188,7 +188,7 @@ int main(int argc, char** argv){
     fftw_execute(h);
 
     vector<vector<complex<double> > > outBeam(ERTab.size(), vector<complex<double> >(ERTab.at(0).size(), complex<double> (0,0)));
-    vector<vector<double > > REoutBeam(ERTab.size(), vector<double> (ERTab.at(0).size(), 0));
+    vector<vector<vector<double > > > REoutBeam(ERTab.size(), vector<vector<double> > (ERTab.at(0).size(), vector<double> (1,0)));
 	
 	k = 0;
 	for (int i = 0; i < ERTab.size(); i++) {
@@ -203,7 +203,7 @@ int main(int argc, char** argv){
 	for (int i = 0; i < ERTab.size(); i++) {
 		for (int j = 0; j < ERTab.at(0).size(); j++) {
 			double REfourEnt = out[k][0];
-			REoutBeam.at(i).at(j) = REfourEnt; 
+			REoutBeam.at(i).at(j).at(0) = REfourEnt; 
 			k++;
 		}
 	}
@@ -218,6 +218,14 @@ int main(int argc, char** argv){
     fftw_destroy_plan(h);
     fftw_destroy_plan(g);
 
-    beam1.rootGraph(argc, argv, outBeam);
+    for (int i = 0; i < REoutBeam.size(); i++) {
+        for (int j = 0; j < REoutBeam.at(0).size(); j++) {
+            cout << REoutBeam.at(i).at(j).at(0) << "\t";
+        }
+        cout << endl;
+    }
+
+//    beam1.rootGraph(argc, argv, beam1.getRealE());
+    beam1.rootGraph(argc, argv, REoutBeam);
     return 0;
 }
