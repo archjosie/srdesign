@@ -60,19 +60,21 @@ double GaussianBeam::calculateHermite(double x, unsigned int m) { //Calculates t
 }
 
 void GaussianBeam::calculateGaussData() {
-    rMax=3;
-    rMin=0;
-	rInt=.1;
-	tMax = 2 * 3.14159265;
-	tMin = 0;
-	tInt = 3.14159265 / 100;
 
-	int rRange = (rMax - rMin) / rInt + 1;
-	int tRange = (tMax - tMin) / tInt + 1
+    dimset=31;
+    xMax=400000;
+    xMin=-xMax;
+	xInt=2*xMax/(dimset-1);
+	yMax=xMax;
+	yMin=-yMax;
+	yInt=xInt;
 
-	for (int i = 0; i < rRange; i++) { //Populate rVals
-		double rCurr = rMin + i*rInt;
-		rVals.push_back(rCurr);
+	int xRange = (xMax - xMin) / xInt + 1;
+	int yRange = (yMax - yMin) / yInt + 1;
+
+	for (int i = 0; i < xRange; i++) { //Populate xVals
+		double xCurr = xMin + i*xInt;
+		xVals.push_back(xCurr);
 	}
 
 	for (int i = 0; i < tRange; i++) { //Populate rVals
@@ -183,7 +185,7 @@ double GaussianBeam::laguerre(double x, double alpha, double k) {
 	if (k == 0) return 1;
 	if (k == 1) return 1 + alpha - x;
 
-	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1)
+	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1);
 }
 
 void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
