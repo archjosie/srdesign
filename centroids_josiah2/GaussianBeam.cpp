@@ -183,6 +183,13 @@ double GaussianBeam::getK()
 	return k;
 }
 
+double GaussianBeam::laguerre(double x, double alpha, double k) {
+	if (k == 0) return 1;
+	if (k == 1) return 1 + alpha - x;
+
+	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1)
+}
+
 void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
