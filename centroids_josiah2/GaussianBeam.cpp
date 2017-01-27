@@ -60,12 +60,13 @@ double GaussianBeam::calculateHermite(double x, unsigned int m) { //Calculates t
 }
 
 void GaussianBeam::calculateGaussData() {
-    xMax=3;
-    xMin=-3;
-	xInt=.1;
-	yMax=3;
-	yMin=-3;
-	yInt=.1;
+    dimset=61;
+    xMax=400000;
+    xMin=-xMax;
+	xInt=2*xMax/(dimset-1);
+	yMax=xMax;
+	yMin=-yMax;
+	yInt=xInt;
 
 	int xRange = (xMax - xMin) / xInt + 1;
 	int yRange = (yMax - yMin) / yInt + 1;
