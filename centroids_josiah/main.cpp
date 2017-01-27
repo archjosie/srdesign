@@ -125,13 +125,13 @@ int main(int argc, char** argv){
     fVec.at(1)=0;
     fVec.at(2)=0;
 
-    //Generate the kapa table (using the step size found in the mathematica nb "Single interface Shifts")
+    //Generate the kappa table (using the step size found in the mathematica nb "Single interface Shifts")
 	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals()));
-			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
+			kPerpTab.at(i).at(j).at(0) = complex<double>(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),0);
+			kPerpTab.at(i).at(j).at(1) = complex<double>(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),0);
 			kPerpTab.at(i).at(j).at(2) = sqrt(complex<double>(1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2),0));
 		}
 	}

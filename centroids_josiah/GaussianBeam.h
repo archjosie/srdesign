@@ -65,7 +65,8 @@ public:
 	vector<double> getXVals();
 	vector<double> getYVals();
 	double getK();
-    
+	double laguerre(double x, double alpha, double k); 
+
     void rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field);
 };
 
