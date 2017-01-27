@@ -7,8 +7,8 @@ using namespace std;
 GaussianBeam::GaussianBeam() {
 	lambda = 1;
 	w0 = 20;
-	m = 0;
-	n = 0;
+	p = 0;
+	l = 0;
 
 	vector<vector<vector<double> > > local(1, vector<vector<double> >(1, vector<double>(1, 0)));
 	this->ReEField = local;
@@ -18,11 +18,11 @@ GaussianBeam::GaussianBeam() {
 	this->zR = calculateRayleigh();
 }
 
-GaussianBeam::GaussianBeam(double w0, double lambda, unsigned int m, unsigned int n) {
+GaussianBeam::GaussianBeam(double w0, double lambda, unsigned int p, unsigned int l) {
     this->w0 = w0;
 	this->lambda = lambda;
-	this->m = m;
-	this->n = n;
+	this->p = p;
+	this->l = l;
 
 	vector<vector<vector<double> > > local(1, vector<vector<double> >(1, vector<double>(1, 0)));
 	this->ReEField = local;
@@ -41,7 +41,7 @@ double GaussianBeam::calculateRadCurv(double z) {
 }
 
 double GaussianBeam::calculateGouy(double z) {
-	return atan(z / zR);
+	return atan(z / zR)*(abs(l) + 2*p);
 }
 
 double GaussianBeam::calculateWaist(double z) {
@@ -60,57 +60,54 @@ double GaussianBeam::calculateHermite(double x, unsigned int m) { //Calculates t
 }
 
 void GaussianBeam::calculateGaussData() {
-    xMax=3;
-    xMin=-3;
-	xInt=.1;
-	yMax=3;
-	yMin=-3;
-	yInt=.1;
+    rMax=3;
+    rMin=0;
+	rInt=.1;
+	tMax = 2 * 3.14159265;
+	tMin = 0;
+	tInt = 3.14159265 / 100;
 
-	int xRange = (xMax - xMin) / xInt + 1;
-	int yRange = (yMax - yMin) / yInt + 1;
+	int rRange = (rMax - rMin) / rInt + 1;
+	int tRange = (tMax - tMin) / tInt + 1
 
-	for (int i = 0; i < xRange; i++) { //Populate xVals
-		double xCurr = xMin + i*xInt;
-		xVals.push_back(xCurr);
+	for (int i = 0; i < rRange; i++) { //Populate rVals
+		double rCurr = rMin + i*rInt;
+		rVals.push_back(rCurr);
 	}
 
-	for (int i = 0; i < yRange; i++) { //Populate yVals
-		double yCurr = yMin + i*yInt;
-		yVals.push_back(yCurr);
+	for (int i = 0; i < tRange; i++) { //Populate rVals
+		double tCurr = tMin + i*tInt;
+		tVals.push_back(tCurr);
 	}
 
 	double theZ; //Stores lower limit on distance from focus
 	theZ=.1;
 	zVals.push_back(theZ);
 
-	vector<vector<vector<double> > > ReLocal(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
+	vector<vector<vector<double> > > ReLocal(xVals.size(), vector<vector<double> >(tVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
 
     ReEField = ReLocal;
     ImEField = ReLocal;
 
-	for (int l = 0; l < zVals.size(); ++l) {  //Weird choice, but this streamlines the program
+	for (int m = 0; m < zVals.size(); ++m) {  //Weird choice, but this streamlines the program
 										  //These only vary with z, so we only need to calculate them once per loop
-		double gouy = calculateGouy(zVals.at(l));
-		double radCurv = calculateRadCurv(zVals.at(l));
-		double spotSize = calculateWaist(zVals.at(l));
+		double gouy = calculateGouy(zVals.at(m));
+		double radCurv = calculateRadCurv(zVals.at(m));
+		double spotSize = calculateWaist(zVals.at(m));
 
-		for (int i = 0; i < xVals.size(); ++i) {
-			for (int j = 0; j < yVals.size(); ++j) {
+		for (int i = 0; i < rVals.size(); ++i) {
+			for (int j = 0; j < tVals.size(); ++j) {
 
-				double r = distance(xVals.at(i), yVals.at(j));
-				//Complex argument for Gaussian E-field
-                
-				double imArg = -(k* zVals.at(l) + k*(pow(r, 2) / (radCurv * 2)) - gouy);
+				double imArg = -(k* zVals.at(m) + k*(pow(rVals.at(i), 2) / (radCurv * 2)) + l*tVals.at(j) - gouy);
 				complex<double> expArg(0.0, imArg);
 
 				complex<double> phasorOut; //Uncomment if we only want to consider real component of field			
-				phasorOut = calculateHermite(sqrt(2)*xVals.at(i) / spotSize, m)*calculateHermite(sqrt(2)*yVals.at(j) / spotSize, n)*(w0 / spotSize)*exp(-pow(r / spotSize, 2))*exp(expArg);
+				phasorOut = laguerre(2*pow(rVals.at(i),2) / pow(spotSize,2), abs(l), p)*pow(sqrt(2)*rVals.at(i) / spotSize, abs(l))*(1 / spotSize)*exp(-pow(rVals.at(i) / spotSize, 2))*exp(expArg);
 				double realField = real(phasorOut);
 				double imagField = imag(phasorOut);
 
-				ReEField.at(i).at(j).at(l) = realField;
-				ImEField.at(i).at(j).at(l) = imagField;
+				ReEField.at(i).at(j).at(m) = realField;
+				ImEField.at(i).at(j).at(m) = imagField;
 			}
 		}
 	}

@@ -38,11 +38,11 @@ class GaussianBeam {
 private:
 	static const double PI;
     
-	double w0, lambda, k, zR, xMin, xMax, xInt, yMin, yMax, yInt, zMin, zMax, zInt;
-	unsigned int m, n;
+	double w0, lambda, k, zR, rMin, rMax, rInt, tMin, tMax, tInt, zMin, zMax, zInt;
+	unsigned int p, l;
     vector<vector<vector<double> > > ReEField;
     vector<vector<vector<double> > > ImEField;
-    vector<double> xVals, yVals, zVals;
+    vector<double> rVals, tVals, zVals;
     
 	double calculateWaist(double z);
 	double calculateRadCurv(double z);
