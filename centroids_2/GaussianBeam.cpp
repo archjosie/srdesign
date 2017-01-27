@@ -60,7 +60,7 @@ double GaussianBeam::calculateHermite(double x, unsigned int m) { //Calculates t
 }
 
 void GaussianBeam::calculateGaussData() {
-    dimset=61;
+    dimset=31;
     xMax=400000;
     xMin=-xMax;
 	xInt=2*xMax/(dimset-1);
@@ -187,7 +187,7 @@ double GaussianBeam::laguerre(double x, double alpha, double k) {
 	if (k == 0) return 1;
 	if (k == 1) return 1 + alpha - x;
 
-	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1)
+	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1);
 }
 
 void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){

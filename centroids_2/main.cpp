@@ -47,7 +47,8 @@ double refinTM(double n, double thetaI) {
 }
 
 double generateK(int index, int dimsize, int k, int xmax) {
-	return (2 * PI) / (2 * k*xmax)*(index-(dimsize+1)/2);
+	return (2 * PI) / (2 * k*xmax)*index;
+	//return (2 * PI) / (2 * k*xmax)*(index-(dimsize+1)/2);
 }
 
 double findMax(vector<double> vals) {
@@ -67,7 +68,7 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 }
 
 int main(int argc, char** argv){
-    GaussianBeam beam1(1.0,.01,0,0);
+    GaussianBeam beam1(20000,1,0,0);
     beam1.calculateGaussData();
     //If we're only worrying about the interface we need to pick option 2
     //(Basically a 2d, 3d vector)
@@ -133,7 +134,9 @@ int main(int argc, char** argv){
 			kPerpTab.at(i).at(j).at(0) = complex<double>(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),0);
 			kPerpTab.at(i).at(j).at(1) = complex<double>(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),0);
 			kPerpTab.at(i).at(j).at(2) = sqrt(complex<double>(1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2),0));
+            cout << generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())) << " " << flush;
 		}
+        cout << "\n" << endl; 
 	}
 
     cout << "kappa table generated" << endl;
@@ -141,7 +144,8 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-            cout << "<" << kPerpTab.at(i).at(j).at(0) << "," << kPerpTab.at(i).at(j).at(1) << "," << kPerpTab.at(i).at(j).at(2) << ">" << " " << flush;
+//            cout << "<" << kPerpTab.at(i).at(j).at(0).imag() << "," << kPerpTab.at(i).at(j).at(1).imag() << "," << kPerpTab.at(i).at(j).at(2).imag() << ">" << " " << flush;
+            cout << "<" << kPerpTab.at(i).at(j).at(2).real() << "," << kPerpTab.at(i).at(j).at(2).imag() << ">" << " " << flush;
 			k++;
 	    }
         cout << "\n" << endl; 
