@@ -1,8 +1,10 @@
 #include "GaussianBeam.h"
 
+// Looking for shift of -1.08401 @ 44 degrees and n=0.6592
+
 const static double PI = 3.14159265;
-const static double NGLASS = 1.3;
-const static double THETA = 30.0;
+const static double NVAL = 0.659283;
+const static double THETA = 44.0;
 using namespace std;
 
 double snell(double n, double thetaIrad) {
@@ -47,8 +49,7 @@ double refinTM(double n, double thetaI) {
 }
 
 double generateK(int index, int dimsize, int k, int xmax) {
-	return (2 * PI) / (2 * k*xmax)*index;
-	//return (2 * PI) / (2 * k*xmax)*(index-(dimsize+1)/2);
+	return (2 * PI) / (2 * k*xmax)*(index-(dimsize+1)/2);
 }
 
 double findMax(vector<double> vals) {
@@ -60,15 +61,16 @@ double findMax(vector<double> vals) {
 vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, vector<complex<double> > kVecs) {
 	vector<complex<double> > theVec(3, complex<double> (0,0));
 
-	theVec.at(0) = f.at(0)*refinTM(NGLASS, theta) - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
-	theVec.at(1) = f.at(1)*refinTE(NGLASS, theta) + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NGLASS, theta) + refinTE(NGLASS, theta));
-	theVec.at(2) = -f.at(0)*refinTM(NGLASS, theta)*kVecs.at(0) - f.at(1)*refinTE(NGLASS, theta)*kVecs.at(1);
+	theVec.at(0) = f.at(0)*refinTM(NVAL, theta) - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
+	theVec.at(1) = f.at(1)*refinTE(NVAL, theta) + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
+	theVec.at(2) = -f.at(0)*refinTM(NVAL, theta)*kVecs.at(0) - f.at(1)*refinTE(NVAL, theta)*kVecs.at(1);
 
 	return theVec;
 }
 
 int main(int argc, char** argv){
-    GaussianBeam beam1(20000,1,0,0);
+    double k0 = 2*PI/(632.8e-9);
+    GaussianBeam beam1(20000/k0,632.8e-9,0,0);
     beam1.calculateGaussData();
     //If we're only worrying about the interface we need to pick option 2
     //(Basically a 2d, 3d vector)
@@ -106,19 +108,9 @@ int main(int argc, char** argv){
 
     cout << "Fourier Data Generated" << endl;
 
-	//k = 0;
-	//for (int i = 0; i < beam1.getRealE().size(); i++) {
-	//	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-    //        cout << "<" << FourData.at(i).at(j).at(0).real() << "," << FourData.at(i).at(j).at(0).imag() << ">" << " " << flush;
-	//		k++;
-	//	}
-    //cout << "\n" << endl; 
-    //}
-
-
     //Define reflection coefficients for TE and TM
-    double refTE = refinTE(NGLASS, THETA);
-	double refTM = refinTM(NGLASS, THETA);
+    double refTE = refinTE(NVAL, THETA);
+	double refTM = refinTM(NVAL, THETA);
 
 	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
     vector<complex<double> > fVec(3, complex<double>(0, 0));
@@ -134,22 +126,10 @@ int main(int argc, char** argv){
 			kPerpTab.at(i).at(j).at(0) = complex<double>(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),0);
 			kPerpTab.at(i).at(j).at(1) = complex<double>(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),0);
 			kPerpTab.at(i).at(j).at(2) = sqrt(complex<double>(1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2),0));
-            cout << generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())) << " " << flush;
 		}
-        cout << "\n" << endl; 
 	}
 
     cout << "kappa table generated" << endl;
-
-	k = 0;
-	for (int i = 0; i < beam1.getRealE().size(); i++) {
-		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-//            cout << "<" << kPerpTab.at(i).at(j).at(0).imag() << "," << kPerpTab.at(i).at(j).at(1).imag() << "," << kPerpTab.at(i).at(j).at(2).imag() << ">" << " " << flush;
-            cout << "<" << kPerpTab.at(i).at(j).at(2).real() << "," << kPerpTab.at(i).at(j).at(2).imag() << ">" << " " << flush;
-			k++;
-	    }
-        cout << "\n" << endl; 
-    }
 
     //From the Mathematica code:
     //eRtab = Table[eR /. {\[Kappa]x -> \[Kappa]tab[[i, j]][[1]], \[Kappa]y -> \[Kappa]tab[[i, j]][[2]]} /. params$here, {i, 1, dimset}, {j, 1, dimset}];
@@ -247,7 +227,17 @@ int main(int argc, char** argv){
 	double nXr = nXrp1 / denom;
 	double nYr = nYrp1 / denom;
 
-	//TODO: Do something about the centroid shift #s, why chop in Mathematica??
+//    complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(2*beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
+//    complex<double> ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(2*beam1.getK()*sqrt(complex<double>(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
+
+    complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
+    complex<double> ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(beam1.getK()*sqrt(complex<double>(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
+
+    cout << "Calculated" << endl;
+    cout << "(" << nXr << "," << nYr << ")" << endl;
+
+    cout << "Analytical" << endl;
+    cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
 
 //    beam1.rootGraph(argc, argv, OGBeamMag);
     beam1.rootGraph(argc, argv, outBeamMag);
