@@ -64,6 +64,7 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 	theVec.at(0) = f.at(0)*refinTM(NVAL, theta) - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
 	theVec.at(1) = f.at(1)*refinTE(NVAL, theta) + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
 	theVec.at(2) = -f.at(0)*refinTM(NVAL, theta)*kVecs.at(0) - f.at(1)*refinTE(NVAL, theta)*kVecs.at(1);
+    cout << refinTM(NVAL, theta) << endl;
 
 	return theVec;
 }
@@ -143,6 +144,7 @@ int main(int argc, char** argv){
 			eRTab.at(i).at(j).at(0) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(0);
 			eRTab.at(i).at(j).at(1) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(1);
 			eRTab.at(i).at(j).at(2) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(2);
+//            cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
 	
@@ -208,12 +210,14 @@ int main(int argc, char** argv){
     fftw_destroy_plan(h);
     fftw_destroy_plan(g);
 
+    //Calculate magnitude of both beams for comparision
 	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
 		outBeamMag.at(i).at(j).at(0) = sqrt(real(outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0))));
 
 	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
 		OGBeamMag.at(i).at(j).at(0) = sqrt(pow(beam1.getRealE().at(i).at(j).at(0),2) + pow(beam1.getImE().at(i).at(j).at(0),2));
 
+    //Calculate centroid Shifts
 	double nXrp1 = 0, nYrp1 = 0, denom = 0;
 	
 	for (int i = 0; i < outBeamMag.size(); i++) {
@@ -227,9 +231,7 @@ int main(int argc, char** argv){
 	double nXr = nXrp1 / denom;
 	double nYr = nYrp1 / denom;
 
-//    complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(2*beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
-//    complex<double> ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(2*beam1.getK()*sqrt(complex<double>(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
-
+    //Compare calculated shifts to analytical result
     complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
     complex<double> ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(beam1.getK()*sqrt(complex<double>(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
 
