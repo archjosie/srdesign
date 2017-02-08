@@ -246,6 +246,6 @@ int main(int argc, char** argv){
 	//TODO: Do something about the centroid shift #s, why chop in Mathematica??
 
 //    beam1.rootGraph(argc, argv, OGBeamMag);
-    beam1.rootGraph(argc, argv, outBeamMag);
+//    beam1.rootGraph(argc, argv, outBeamMag);
     return 0;
 }
