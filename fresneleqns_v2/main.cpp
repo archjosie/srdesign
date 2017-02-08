@@ -2,7 +2,7 @@
 #include <math.h>
 #include <cmath>
 #include <vector>
-#include <assert.h> //Enables use of assert function (VERY useful for debugs)
+#include <assert.h>
 
 #define PI 3.14159265
 

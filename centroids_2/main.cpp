@@ -58,8 +58,12 @@ double findMax(vector<double> vals) {
 	return max;
 }
 
-vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, vector<complex<double> > kVecs) {
+vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, vector<double>  REkVecs) {
 	vector<complex<double> > theVec(3, complex<double> (0,0));
+	vector<complex<double> > kVecs(0, complex<double> (0,0));
+    kVecs.push_back(complex<double>(REkVecs.at(0),0));
+    kVecs.push_back(complex<double>(REkVecs.at(1),0));
+    kVecs.push_back(complex<double>(REkVecs.at(2),0));
 
 	theVec.at(0) = f.at(0)*refinTM(NVAL, theta) - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
 	theVec.at(1) = f.at(1)*refinTE(NVAL, theta) + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
@@ -85,17 +89,17 @@ int main(int argc, char** argv){
     fVec.at(2)=0;
 
     //Generate the kappa table (using the step size found in the mathematica nb "Single interface Shifts")
-	vector<vector<vector<complex<double> > > > kPerpTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
-	vector<vector<double> > kComp(beam1.getRealE().size(), vector<double>(beam1.getRealE().size()));
+	vector<vector<vector<double> > > kPerpTab(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double> (3, 0)));
+	vector<vector<double> > kComp(beam1.getRealE().size(), vector<double>(beam1.getRealE().at(0).size()));
 
     cout << "We're good up to here" << endl;
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			kPerpTab.at(i).at(j).at(0) = complex<double>(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),0);
-			kPerpTab.at(i).at(j).at(1) = complex<double>(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),0);
-			kPerpTab.at(i).at(j).at(2) = sqrt(complex<double>(1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2),0));
-			kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2);
+			//kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals()));
+			//kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
+			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2)));
+			//kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2);
 		}
 	}
 
@@ -128,9 +132,9 @@ int main(int argc, char** argv){
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			complex<double> fourEnt(out[k][0], out[k][1]);
 			FourData.at(i).at(j).at(0) = fourEnt;
-            if (kComp.at(i).at(j)>=1.0){
-                FourData.at(i).at(j).at(0) = (0,0);
-            }
+//            if (kComp.at(i).at(j)>=1.0){
+//                FourData.at(i).at(j).at(0) = (0,0);
+//            }
 			k++;
 		}
 	}
@@ -146,9 +150,7 @@ int main(int argc, char** argv){
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			eRTab.at(i).at(j).at(0) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(0);
-			eRTab.at(i).at(j).at(1) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(1);
-			eRTab.at(i).at(j).at(2) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j)).at(2);
+			eRTab.at(i).at(j) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j));
 //            cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
