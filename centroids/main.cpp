@@ -66,7 +66,7 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 	return theVec;
 }
 
-vector<vector<vector<complex<double> > > > 3DComplexZip(vector<vector<vector<double> > > reVec, vector<vector<vector<double> > > imVec) {
+vector<vector<vector<complex<double> > > > ComplexZip3D(vector<vector<vector<double> > > reVec, vector<vector<vector<double> > > imVec) {
 	//Takes two 3D vectors containing real and imaginary parts of complex numbers and compresses them into one complex vector
 
 	vector<vector<vector<complex<double> > > > compOut(reVec.size(), vector<vector<complex<double> > >(reVec.at(0).size(), vector<complex<double> >(reVec.at(0).at(0).size(), complex<double>(0, 0))));
