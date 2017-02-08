@@ -39,11 +39,11 @@ private:
 	static const double PI;
     
 
-	double w0, lambda, k, zR, xMin, xMax, xInt, yMin, yMax, yInt, zMin, zMax, zInt, dimset;
-	unsigned int m, n;
+	double w0, lambda, k, zR, xMin, xMax, xInt, yMin, yMax, yInt, zMin, zMax, zInt, dimset, tMin, tInt, tRange;
+	unsigned int p, l;
     vector<vector<vector<double> > > ReEField;
     vector<vector<vector<double> > > ImEField;
-    vector<double> rVals, tVals, zVals;
+    vector<double> rVals, tVals, zVals, xVals, yVals;
     
 	double calculateWaist(double z);
 	double calculateRadCurv(double z);
