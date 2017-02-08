@@ -41,7 +41,7 @@ double tTE(double n, double theta, vector<double> kvec){
     return coeff;
 } 
 
-double tTE(double n, double theta, vector<double> kvec){
+double tTM(double n, double theta, vector<double> kvec){
     vector<double> nvec(0);
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
@@ -62,6 +62,9 @@ int main(){
     kvec.push_back(1.0);
 
     cout << rTE(n, theta, kvec) << endl;
+    cout << rTM(n, theta, kvec) << endl;
+    cout << tTE(n, theta, kvec) << endl;
+    cout << tTM(n, theta, kvec) << endl;
 	
     return 0;
 }

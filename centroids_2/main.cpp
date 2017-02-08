@@ -7,46 +7,49 @@ const static double NVAL = 0.659283;
 const static double THETA = 44.0;
 using namespace std;
 
-double snell(double n, double thetaIrad) {
-	double arg, thetaTrad;
-	arg = 1 / n * sin(thetaIrad);
-	thetaTrad = asin(arg);
-	return thetaTrad;
-}
+double rTE(double n, double theta, vector<double> kvec){
+    vector<double> nvec(0);
+    nvec.push_back(-sin(theta));
+    nvec.push_back(0);
+    nvec.push_back(cos(theta));
 
-double refcofTE(double n, double thetaI) {
-	double thetaTrad, thetaIrad, refcofTE;
-	thetaIrad = thetaI*PI / 180;
-	thetaTrad = snell(n, thetaIrad);
-	refcofTE = abs((cos(thetaIrad) - n*cos(thetaTrad)) / (cos(thetaIrad) + n*cos(thetaTrad)));
-	return refcofTE;
-}
+    double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
+    double coeff= (cos(beta)-sqrt(pow(n,2)-pow(sin(beta),2)))/(cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
+    return coeff;
+} 
 
-double refinTE(double n, double thetaI) {
-	double thetaTrad, thetaIrad, refcofTE, refinTE;
-	thetaIrad = thetaI*PI / 180;
-	thetaTrad = snell(n, thetaIrad);
-	refcofTE = abs((cos(thetaIrad) - n*cos(thetaTrad)) / (cos(thetaIrad) + n*cos(thetaTrad)));
-	refinTE = pow(refcofTE, 2);
-	return refinTE;
-}
+double rTM(double n, double theta, vector<double> kvec){
+    vector<double> nvec(0);
+    nvec.push_back(-sin(theta));
+    nvec.push_back(0);
+    nvec.push_back(cos(theta));
 
-double refcofTM(double n, double thetaI) {
-	double thetaTrad, thetaIrad, refcofTM;
-	thetaIrad = thetaI*PI / 180;
-	thetaTrad = snell(n, thetaIrad);
-	refcofTM = abs((cos(thetaTrad) - n*cos(thetaIrad)) / (cos(thetaTrad) + n*cos(thetaIrad)));
-	return refcofTM;
-}
+    double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
+    double coeff= (pow(n,2)*cos(beta)-sqrt(pow(n,2)-pow(sin(beta),2)))/(pow(n,2)*cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
+    return coeff;
+} 
 
-double refinTM(double n, double thetaI) {
-	double thetaTrad, thetaIrad, refcofTM, refinTM;
-	thetaIrad = thetaI*PI / 180;
-	thetaTrad = snell(n, thetaIrad);
-	refcofTM = abs((cos(thetaTrad) - n*cos(thetaIrad)) / (cos(thetaTrad) + n*cos(thetaIrad)));
-	refinTM = pow(refcofTM, 2);
-	return refinTM;
-}
+double tTE(double n, double theta, vector<double> kvec){
+    vector<double> nvec(0);
+    nvec.push_back(-sin(theta));
+    nvec.push_back(0);
+    nvec.push_back(cos(theta));
+
+    double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
+    double coeff= (2*cos(beta))/(cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
+    return coeff;
+} 
+
+double tTM(double n, double theta, vector<double> kvec){
+    vector<double> nvec(0);
+    nvec.push_back(-sin(theta));
+    nvec.push_back(0);
+    nvec.push_back(cos(theta));
+
+    double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
+    double coeff= (2*n*cos(beta))/(pow(n,2)*cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
+    return coeff;
+} 
 
 double generateK(int index, int dimsize, int k, int xmax) {
 	return (2 * PI) / (2 * k*xmax)*(index-(dimsize+1)/2);
@@ -64,11 +67,13 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
     kVecs.push_back(complex<double>(REkVecs.at(0),0));
     kVecs.push_back(complex<double>(REkVecs.at(1),0));
     kVecs.push_back(complex<double>(REkVecs.at(2),0));
+    complex<double> refTM = (rTM(NVAL, theta, REkVecs),0);
+    complex<double> refTE = (rTM(NVAL, theta, REkVecs),0);
 
-	theVec.at(0) = f.at(0)*refinTM(NVAL, theta) - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
-	theVec.at(1) = f.at(1)*refinTE(NVAL, theta) + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refinTM(NVAL, theta) + refinTE(NVAL, theta));
-	theVec.at(2) = -f.at(0)*refinTM(NVAL, theta)*kVecs.at(0) - f.at(1)*refinTE(NVAL, theta)*kVecs.at(1);
-    cout << refinTM(NVAL, theta) << endl;
+	theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
+	theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
+	theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
+    cout << refTM << endl;
 
 	return theVec;
 }
@@ -77,10 +82,6 @@ int main(int argc, char** argv){
     double k0 = 2*PI/(632.8e-9);
     GaussianBeam beam1(20000/k0,632.8e-9,0,0);
     beam1.calculateGaussData();
-
-    //Define reflection coefficients for TE and TM
-    double refTE = refinTE(NVAL, THETA);
-	double refTM = refinTM(NVAL, THETA);
 
 	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
     vector<complex<double> > fVec(3, complex<double>(0, 0));
