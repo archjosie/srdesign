@@ -66,6 +66,25 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 	return theVec;
 }
 
+vector<vector<vector<complex<double> > > > 3DComplexZip(vector<vector<vector<double> > > reVec, vector<vector<vector<double> > > imVec) {
+	//Takes two 3D vectors containing real and imaginary parts of complex numbers and compresses them into one complex vector
+
+	vector<vector<vector<complex<double> > > > compOut(reVec.size(), vector<vector<complex<double> > >(reVec.at(0).size(), vector<complex<double> >(reVec.at(0).at(0).size(), complex<double>(0, 0))));
+
+	if ((reVec.size() == imVec.size()) && (reVec.at(0).size() == imVec.at(0).size()) && (reVec.at(0).at(0).size() == imVec.at(0).at(0).size())) { //Assert the vectors to zip have same dimensions
+		for (int i = 0; i < reVec.size(); i++) {
+			for (int j = 0; j < reVec.at(0).size(); j++) {
+				for (int k = 0; k < reVec.at(0).at(0).size(); k++) {
+					complex<double> tmp(reVec.at(i).at(j).at(k), imVec.at(i).at(j).at(k));
+					compOut.at(i).at(j)at(k) = tmp;
+				}
+			}
+		}
+	}
+
+	return compOut;
+}
+
 int main(int argc, char** argv){
     GaussianBeam beam1(1.0,.01,0,0);
     beam1.calculateGaussData();
@@ -77,7 +96,7 @@ int main(int argc, char** argv){
 	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 	out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 
-    //Create plane for forward transform
+    //Create plan for forward transform
 	fftw_plan g = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	int k = 0;
