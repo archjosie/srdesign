@@ -73,7 +73,7 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 	theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
-    cout << refTM << endl;
+   // cout << refTM << endl;
 
 	return theVec;
 }
@@ -97,10 +97,10 @@ int main(int argc, char** argv){
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			//kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals()));
-			//kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
+			kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals()));
+			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
 			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2)));
-			//kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2);
+			kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2);
 		}
 	}
 
@@ -110,10 +110,11 @@ int main(int argc, char** argv){
 	fftw_complex *in, *out, *in2, *out2;
 	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 	out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
+	//cout << "Memory allocated" << endl;
 
     //Create plane for forward transform
 	fftw_plan g = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-
+	cout << "This is " << beam1.getRealE().size() * beam1.getRealE().at(0).size() << endl;
 	int k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
@@ -133,9 +134,7 @@ int main(int argc, char** argv){
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			complex<double> fourEnt(out[k][0], out[k][1]);
 			FourData.at(i).at(j).at(0) = fourEnt;
-//            if (kComp.at(i).at(j)>=1.0){
-//                FourData.at(i).at(j).at(0) = (0,0);
-//            }
+            if (kComp.at(i).at(j)>=1.0) FourData.at(i).at(j).at(0) = (0,0);
 			k++;
 		}
 	}
@@ -250,6 +249,6 @@ int main(int argc, char** argv){
     cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
 
 //    beam1.rootGraph(argc, argv, OGBeamMag);
-    beam1.rootGraph(argc, argv, outBeamMag);
+ //   beam1.rootGraph(argc, argv, outBeamMag);
     return 0;
 }

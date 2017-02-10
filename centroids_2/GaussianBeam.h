@@ -9,7 +9,7 @@
 #include <vector>
 #include <complex>
 
-#include <TCanvas.h>
+/*#include <TCanvas.h>
 #include <TROOT.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
@@ -28,6 +28,7 @@
 #include <TRandom.h>
 #include <TColor.h>
 #include <TExec.h>
+*/
 
 #include<fftw3.h>
 
@@ -40,7 +41,7 @@ private:
     
 
 	double w0, lambda, k, zR, xMin, xMax, xInt, yMin, yMax, yInt, zMin, zMax, zInt, dimset, tMin, tInt, tRange;
-	unsigned int p, l;
+	int p, l;
     vector<vector<vector<double> > > ReEField;
     vector<vector<vector<double> > > ImEField;
     vector<double> rVals, tVals, zVals, xVals, yVals;
@@ -50,6 +51,8 @@ private:
 	double calculateRayleigh();
 	double calculateGouy(double z);
 	double calculateHermite(double x, unsigned int m);
+
+	int sign(double val);
 	
 public:
 	GaussianBeam();

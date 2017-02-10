@@ -61,6 +61,8 @@ double GaussianBeam::calculateHermite(double x, unsigned int m) { //Calculates t
 
 void GaussianBeam::calculateGaussData() {
 
+	double PI = 3.14159265;
+
     dimset=31;
     xMax=400000;
     xMin=-xMax;
@@ -77,16 +79,16 @@ void GaussianBeam::calculateGaussData() {
 		xVals.push_back(xCurr);
 	}
 
-	for (int i = 0; i < tRange; i++) { //Populate rVals
-		double tCurr = tMin + i*tInt;
-		tVals.push_back(tCurr);
+	for (int i = 0; i < yRange; i++) { //Populate rVals
+		double yCurr = yMin + i*yInt;
+		yVals.push_back(yCurr);
 	}
 
 	double theZ; //Stores lower limit on distance from focus
 	theZ=.1;
 	zVals.push_back(theZ);
 
-	vector<vector<vector<double> > > ReLocal(xVals.size(), vector<vector<double> >(tVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
+	vector<vector<vector<double> > > ReLocal(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
 
     ReEField = ReLocal;
     ImEField = ReLocal;
@@ -97,14 +99,21 @@ void GaussianBeam::calculateGaussData() {
 		double radCurv = calculateRadCurv(zVals.at(m));
 		double spotSize = calculateWaist(zVals.at(m));
 
-		for (int i = 0; i < rVals.size(); ++i) {
-			for (int j = 0; j < tVals.size(); ++j) {
+		for (int i = 0; i < xVals.size(); ++i) {
+			for (int j = 0; j < yVals.size(); ++j) {
 
-				double imArg = -(k* zVals.at(m) + k*(pow(rVals.at(i), 2) / (radCurv * 2)) + l*tVals.at(j) - gouy);
+				double r = distance(xVals.at(i), yVals.at(j));
+				double t;
+				if (abs(yVals.at(j)) < PI*1e-10) t = PI - sign(xVals.at(i))*PI / 2;
+				else t = atan(xVals.at(i) / yVals.at(j));
+
+				double imArg = -(k* zVals.at(m) + k*(pow(r, 2) / (radCurv * 2)) + l*t - gouy);
 				complex<double> expArg(0.0, imArg);
+				//cout << expArg << endl;
 
 				complex<double> phasorOut; //Uncomment if we only want to consider real component of field			
-				phasorOut = laguerre(2*pow(rVals.at(i),2) / pow(spotSize,2), abs(l), p)*pow(sqrt(2)*rVals.at(i) / spotSize, abs(l))*(1 / spotSize)*exp(-pow(rVals.at(i) / spotSize, 2))*exp(expArg);
+				phasorOut = laguerre(2*pow(r,2) / pow(spotSize,2), abs(l), p)*pow(sqrt(2)*r / spotSize, abs(l))*(1 / spotSize)*exp(-pow(r / spotSize, 2))*exp(expArg);
+				//cout << phasorOut << endl;
 				double realField = real(phasorOut);
 				double imagField = imag(phasorOut);
 
@@ -188,7 +197,13 @@ double GaussianBeam::laguerre(double x, double alpha, double k) {
 	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1);
 }
 
-void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
+int GaussianBeam::sign(double val) {
+	if (val > 0) return 1;
+	if (val < 0) return -1;
+	return 0;
+}
+
+/*void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
     gStyle->SetOptStat(0);
@@ -213,4 +228,4 @@ void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double>
     // Output PDF
     c1->Print("GBplots.pdf","pdf");
     theApp.Run();
-}
+}*/
