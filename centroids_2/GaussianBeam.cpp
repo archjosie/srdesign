@@ -63,8 +63,9 @@ void GaussianBeam::calculateGaussData() {
 
 	double PI = 3.14159265;
 
-    dimset=31;
+    dimset=201;
     xMax=400000;
+   // xMax=.01;
     xMin=-xMax;
 	xInt=2*xMax/(dimset-1);
 	yMax=xMax;
@@ -77,11 +78,13 @@ void GaussianBeam::calculateGaussData() {
 	for (int i = 0; i < xRange; i++) { //Populate xVals
 		double xCurr = xMin + i*xInt;
 		xVals.push_back(xCurr);
+       // cout << "New x: " << xCurr << endl;
 	}
 
 	for (int i = 0; i < yRange; i++) { //Populate rVals
 		double yCurr = yMin + i*yInt;
 		yVals.push_back(yCurr);
+       // cout << "New y: " << yCurr << endl;
 	}
 
 	double theZ; //Stores lower limit on distance from focus
@@ -203,7 +206,7 @@ int GaussianBeam::sign(double val) {
 	return 0;
 }
 
-/*void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
+void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
     gStyle->SetOptStat(0);
@@ -228,4 +231,4 @@ int GaussianBeam::sign(double val) {
     // Output PDF
     c1->Print("GBplots.pdf","pdf");
     theApp.Run();
-}*/
+}

@@ -29,28 +29,6 @@ double rTM(double n, double theta, vector<double> kvec){
     return coeff;
 } 
 
-double tTE(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
-    nvec.push_back(-sin(theta));
-    nvec.push_back(0);
-    nvec.push_back(cos(theta));
-
-    double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
-    double coeff= (2*cos(beta))/(cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
-    return coeff;
-} 
-
-double tTM(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
-    nvec.push_back(-sin(theta));
-    nvec.push_back(0);
-    nvec.push_back(cos(theta));
-
-    double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
-    double coeff= (2*n*cos(beta))/(pow(n,2)*cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
-    return coeff;
-} 
-
 double generateK(int index, int dimsize, int k, int xmax) {
 	return (2 * PI) / (2 * k*xmax)*(index-(dimsize+1)/2);
 }
@@ -73,7 +51,7 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 	theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
-   // cout << refTM << endl;
+    //cout << refTM << endl;
 
 	return theVec;
 }
@@ -81,6 +59,7 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 int main(int argc, char** argv){
     double k0 = 2*PI/(632.8e-9);
     GaussianBeam beam1(20000/k0,632.8e-9,0,0);
+//    GaussianBeam beam1(1,1,0,0);
     beam1.calculateGaussData();
 
 	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
@@ -101,6 +80,7 @@ int main(int argc, char** argv){
 			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
 			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2)));
 			kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2);
+            //cout << kPerpTab.at(i).at(j).at(0) << "," << kPerpTab.at(i).at(j).at(1) << "," << kPerpTab.at(i).at(j).at(2) << endl;
 		}
 	}
 
@@ -110,16 +90,15 @@ int main(int argc, char** argv){
 	fftw_complex *in, *out, *in2, *out2;
 	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 	out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
-	//cout << "Memory allocated" << endl;
 
     //Create plane for forward transform
 	fftw_plan g = fftw_plan_dft_2d(beam1.getRealE().size(), beam1.getRealE().at(0).size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-	cout << "This is " << beam1.getRealE().size() * beam1.getRealE().at(0).size() << endl;
 	int k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0);
+       //     cout << beam1.getRealE().at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -135,6 +114,7 @@ int main(int argc, char** argv){
 			complex<double> fourEnt(out[k][0], out[k][1]);
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (kComp.at(i).at(j)>=1.0) FourData.at(i).at(j).at(0) = (0,0);
+            //cout << FourData.at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -151,7 +131,7 @@ int main(int argc, char** argv){
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			eRTab.at(i).at(j) = ETildeBase(fVec, THETA, kPerpTab.at(i).at(j));
-//            cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
+            //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
 	
@@ -248,7 +228,7 @@ int main(int argc, char** argv){
     cout << "Analytical" << endl;
     cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
 
-//    beam1.rootGraph(argc, argv, OGBeamMag);
+    beam1.rootGraph(argc, argv, OGBeamMag);
  //   beam1.rootGraph(argc, argv, outBeamMag);
     return 0;
 }

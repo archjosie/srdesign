@@ -9,7 +9,7 @@
 #include <vector>
 #include <complex>
 
-/*#include <TCanvas.h>
+#include <TCanvas.h>
 #include <TROOT.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
@@ -28,7 +28,7 @@
 #include <TRandom.h>
 #include <TColor.h>
 #include <TExec.h>
-*/
+
 
 #include<fftw3.h>
 
