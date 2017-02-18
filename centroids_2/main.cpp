@@ -73,18 +73,22 @@ int main(int argc, char** argv){
 	vector<vector<double> > kComp(beam1.getRealE().size(), vector<double>(beam1.getRealE().at(0).size()));
 
     cout << "We're good up to here" << endl;
+	double xKappa = findMax(beam1.getXVals());
+	double yKappa = findMax(beam1.getYVals());
+
+	time_t start = clock();
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals()));
-			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals()));
-			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())), 2)));
-			kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), findMax(beam1.getXVals())),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), findMax(beam1.getYVals())),2);
+			kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa);
+			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), yKappa);
+			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa), 2)));
+			kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2);
             //cout << kPerpTab.at(i).at(j).at(0) << "," << kPerpTab.at(i).at(j).at(1) << "," << kPerpTab.at(i).at(j).at(2) << endl;
 		}
 	}
 
-    cout << "kappa table generated" << endl;
+    cout << "kappa table generated in " << (clock() - start)/CLOCKS_PER_SEC <<  " seconds." << endl;
 
     //Generate the input and output vectors for fftw
 	fftw_complex *in, *out, *in2, *out2;
@@ -98,7 +102,8 @@ int main(int argc, char** argv){
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0);
-            cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+            //cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+
 			k++;
 		}
 	}
@@ -228,7 +233,7 @@ int main(int argc, char** argv){
     cout << "Analytical" << endl;
     cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
 
-    beam1.rootGraph(argc, argv, OGBeamMag);
+  //  beam1.rootGraph(argc, argv, OGBeamMag);
  //   beam1.rootGraph(argc, argv, outBeamMag);
     return 0;
 }

@@ -4,11 +4,12 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+#include <ctime>
 #include <string>
 #include <fstream>
 #include <vector>
 #include <complex>
-
+/*
 #include <TCanvas.h>
 #include <TROOT.h>
 #include <TGraphErrors.h>
@@ -28,7 +29,7 @@
 #include <TRandom.h>
 #include <TColor.h>
 #include <TExec.h>
-
+*/
 
 #include<fftw3.h>
 
@@ -71,7 +72,7 @@ public:
 	double getK();
 	double laguerre(double x, double alpha, double k); 
 
-    void rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field);
+ //   void rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field);
 };
 
 #endif
