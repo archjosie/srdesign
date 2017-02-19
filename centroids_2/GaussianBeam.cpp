@@ -63,7 +63,11 @@ void GaussianBeam::calculateGaussData() {
 
 	double PI = 3.14159265;
 
+<<<<<<< HEAD
     dimset=51;
+=======
+    dimset=201;
+>>>>>>> 64b561754d28a74295300c4d0006114d907f5f19
     xMax=400000;
    // xMax=.01;
     xMin=-xMax;
@@ -206,7 +210,7 @@ int GaussianBeam::sign(double val) {
 	return 0;
 }
 
-void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
+/*void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
     gStyle->SetOptStat(0);
@@ -231,4 +235,4 @@ void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double>
     // Output PDF
     c1->Print("GBplots.pdf","pdf");
     theApp.Run();
-}
+}*/
