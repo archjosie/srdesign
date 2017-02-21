@@ -103,7 +103,6 @@ int main(int argc, char** argv){
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0);
             //cout << beam1.getRealE().at(i).at(j).at(0) << endl;
-
 			k++;
 		}
 	}
