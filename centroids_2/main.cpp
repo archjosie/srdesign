@@ -57,8 +57,8 @@ vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, v
 }
 
 int main(int argc, char** argv){
-    double k0 = 2*PI/(632.8e-9);
-    GaussianBeam beam1(20000/k0,632.8e-9,0,0);
+    double k0 = 1;
+    GaussianBeam beam1(20000/k0,2*PI,0,0);
 //    GaussianBeam beam1(1,1,0,0);
     beam1.calculateGaussData();
 
@@ -72,7 +72,6 @@ int main(int argc, char** argv){
 	/*vector<vector<vector<double> > > kPerpTab(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double> (3, 0)));
 	vector<vector<double> > kComp(beam1.getRealE().size(), vector<double>(beam1.getRealE().at(0).size()));
 	*/
-    cout << "We're good up to here" << endl;
 	double xKappa = findMax(beam1.getXVals());
 	double yKappa = findMax(beam1.getYVals());
 
@@ -240,7 +239,7 @@ int main(int argc, char** argv){
 
 	cout << "Total time elapsed: " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
-  //  beam1.rootGraph(argc, argv, OGBeamMag);
- //   beam1.rootGraph(argc, argv, outBeamMag);
+    beam1.rootGraph(argc, argv, OGBeamMag);
+    beam1.rootGraph(argc, argv, outBeamMag);
     return 0;
 }
