@@ -9,7 +9,7 @@
 using namespace std;
 
 double rTE(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
+    vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
@@ -20,7 +20,7 @@ double rTE(double n, double theta, vector<double> kvec){
 } 
 
 double rTM(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
+    vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
@@ -31,7 +31,7 @@ double rTM(double n, double theta, vector<double> kvec){
 } 
 
 double tTE(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
+    vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
@@ -42,7 +42,7 @@ double tTE(double n, double theta, vector<double> kvec){
 } 
 
 double tTM(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
+    vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
@@ -56,7 +56,7 @@ int main(){
 //    double n = 1.6592;
     double n = .6;
     double theta = 30*PI/180;
-    vector<double> kvec(0);
+    vector<double> kvec;
     kvec.push_back(0.0);
     kvec.push_back(0.0);
     kvec.push_back(1.0);
