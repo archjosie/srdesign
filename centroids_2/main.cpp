@@ -81,26 +81,26 @@ int main(int argc, char** argv){
 
 	time_t start = clock();
 	
-	for (int i = 0; i < beam1.getRealE().size(); i++) {
-		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			kPerpTab.at(i).at(j).at(0) = generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa);
-			kPerpTab.at(i).at(j).at(1) = generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa);
-			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2)- pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa), 2)));
-			kComp.at(i).at(j)= pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa),2)+pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2);
-            //cout << kPerpTab.at(i).at(j).at(0) << "," << kPerpTab.at(i).at(j).at(1) << "," << kPerpTab.at(i).at(j).at(2) << endl;
-		}
-	}
+	//for (int i = 0; i < beam1.getRealE().size(); i++) {
+	//	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
+	//		kPerpTab.at(i).at(j).at(0) = generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa);
+	//		kPerpTab.at(i).at(j).at(1) = generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa);
+	//		kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2)- pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa), 2)));
+	//		kComp.at(i).at(j)= pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa),2)+pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2);
+    //        //cout << kPerpTab.at(i).at(j).at(0) << "," << kPerpTab.at(i).at(j).at(1) << "," << kPerpTab.at(i).at(j).at(2) << endl;
+	//	}
+	//}
 	
-	for (int j = 0; j < beam1.getRealE().size(); j++) {
-		for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
-			for (int k = 0; k < 2; k++) {
-				cout << kPerpTab.at(i).at(j).at(k) << " ";
-			}
-			cout << "\t";
-		}
+	//for (int j = 0; j < beam1.getRealE().size(); j++) {
+	//	for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
+	//		for (int k = 0; k < 2; k++) {
+	//			cout << kPerpTab.at(i).at(j).at(k) << " ";
+	//		}
+	//		cout << "\t";
+	//	}
 
-		cout << endl;
-	}
+	//	cout << endl;
+	//}
 	
     //Generate the input and output vectors for fftw
 	fftw_complex *in, *out, *in2, *out2;
@@ -131,7 +131,7 @@ int main(int argc, char** argv){
 			complex<double> fourEnt(out[k][0], out[k][1]);
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
-            cout << FourData.at(i).at(j).at(0) << endl;
+            //cout << FourData.at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -170,16 +170,16 @@ int main(int argc, char** argv){
     	}
     }
 	
-	for (int j = 0; j < beam1.getRealE().size(); j++) {
-		for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
-			for (int k = 0; k < 3; k++) {
-				cout << eRTab.at(i).at(j).at(k) << " ";
-			}
-			cout << "\t";
-		}
+	//for (int j = 0; j < beam1.getRealE().size(); j++) {
+	//	for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
+	//		for (int k = 0; k < 3; k++) {
+	//			cout << eRTab.at(i).at(j).at(k) << " ";
+	//		}
+	//		cout << "\t";
+	//	}
 
-		cout << endl;
-	}
+	//	cout << endl;
+	//}
         
 	cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
@@ -245,7 +245,7 @@ int main(int argc, char** argv){
 			nXrp1 += (j+1) * outBeamMag.at(i).at(j).at(0);
 			nYrp1 += (i+1) * outBeamMag.at(i).at(j).at(0);
 			denom += outBeamMag.at(i).at(j).at(0);
-			cout << nXrp1 << " " << nYrp1 << " " << denom << endl;
+			//cout << nXrp1 << " " << nYrp1 << " " << denom << endl;
 		}
 	}
 
