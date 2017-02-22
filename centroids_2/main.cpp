@@ -4,29 +4,33 @@
 
 const static double PI = 3.14159265;
 const static double NVAL = 0.659283;
-const static double THETA = 44.0;
+const static double THETA = 60.0;
 using namespace std;
 
-double rTE(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
+complex<double> rTE(double n, double theta, vector<double> kvec){
+	theta *= PI / 180;
+    vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
 
     double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
-    double coeff= (cos(beta)-sqrt(pow(n,2)-pow(sin(beta),2)))/(cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
-    return coeff;
+	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
+	complex<double> ans = (cos(beta) - sqrt(arg)) / (cos(beta) + sqrt(arg));
+	return ans;
 } 
 
-double rTM(double n, double theta, vector<double> kvec){
-    vector<double> nvec(0);
+complex<double> rTM(double n, double theta, vector<double> kvec){
+	theta *= PI / 180;
+    vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
 
     double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
-    double coeff= (pow(n,2)*cos(beta)-sqrt(pow(n,2)-pow(sin(beta),2)))/(pow(n,2)*cos(beta)+sqrt(pow(n,2)-pow(sin(beta),2)));
-    return coeff;
+	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
+	complex<double> ans = (pow(n,2)*cos(beta)-sqrt(arg))/(pow(n,2)*cos(beta)+sqrt(arg));
+	return ans;
 } 
 
 double generateK(int index, int dimsize, int k, int xmax) {
@@ -39,19 +43,19 @@ double findMax(vector<double> vals) {
 	return max;
 }
 
-vector<complex<double> > ETildeBase (vector<complex<double> > f, double theta, vector<double>  REkVecs) {
+vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vector<double>  REkVecs) {
 	vector<complex<double> > theVec(3, complex<double> (0,0));
 	vector<complex<double> > kVecs(0, complex<double> (0,0));
     kVecs.push_back(complex<double>(REkVecs.at(0),0));
     kVecs.push_back(complex<double>(REkVecs.at(1),0));
     kVecs.push_back(complex<double>(REkVecs.at(2),0));
-    complex<double> refTM = (rTM(NVAL, theta, REkVecs),0);
-    complex<double> refTE = (rTE(NVAL, theta, REkVecs),0);
+    complex<double> refTM = rTM(NVAL, theta, REkVecs);
+    complex<double> refTE = rTE(NVAL, theta, REkVecs);
 
 	theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
-    //cout << refTM << endl;
+    //cout << "(" << real(rTM(NVAL, theta, REkVecs)) << "," << imag(rTM(NVAL, theta, REkVecs)) << ")\t(" << real(rTE(NVAL, theta, REkVecs)) << "," <<  real(rTM(NVAL, theta, REkVecs)) << ")" << endl;
 
 	return theVec;
 }
@@ -69,26 +73,35 @@ int main(int argc, char** argv){
     fVec.at(2)=0;
 
     //Generate the kappa table (using the step size found in the mathematica nb "Single interface Shifts")
-	/*vector<vector<vector<double> > > kPerpTab(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double> (3, 0)));
+	vector<vector<vector<double> > > kPerpTab(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double> (3, 0)));
 	vector<vector<double> > kComp(beam1.getRealE().size(), vector<double>(beam1.getRealE().at(0).size()));
-	*/
+	
 	double xKappa = findMax(beam1.getXVals());
 	double yKappa = findMax(beam1.getYVals());
 
 	time_t start = clock();
-
-	/*for (int i = 0; i < beam1.getRealE().size(); i++) {
+	
+	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			kPerpTab.at(i).at(j).at(0) = generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa);
-			kPerpTab.at(i).at(j).at(1) = generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), yKappa);
-			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2)- pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa), 2)));
-			kComp.at(i).at(j)= pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2)+pow(generateK(j, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2);
+			kPerpTab.at(i).at(j).at(0) = generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa);
+			kPerpTab.at(i).at(j).at(1) = generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa);
+			kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2)- pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa), 2)));
+			kComp.at(i).at(j)= pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa),2)+pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2);
             //cout << kPerpTab.at(i).at(j).at(0) << "," << kPerpTab.at(i).at(j).at(1) << "," << kPerpTab.at(i).at(j).at(2) << endl;
 		}
 	}
 	
-    
-	*/
+	for (int j = 0; j < beam1.getRealE().size(); j++) {
+		for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
+			for (int k = 0; k < 2; k++) {
+				cout << kPerpTab.at(i).at(j).at(k) << " ";
+			}
+			cout << "\t";
+		}
+
+		cout << endl;
+	}
+	
     //Generate the input and output vectors for fftw
 	fftw_complex *in, *out, *in2, *out2;
 	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
@@ -118,7 +131,7 @@ int main(int argc, char** argv){
 			complex<double> fourEnt(out[k][0], out[k][1]);
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
-            //cout << FourData.at(i).at(j).at(0) << endl;
+            cout << FourData.at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -135,10 +148,10 @@ int main(int argc, char** argv){
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			vector<double> kVec;
-			kVec.push_back(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa));
-			kVec.push_back(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa));
+			kVec.push_back(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa));
+			kVec.push_back(generateK(j+1, beam1.getRealE().size(), beam1.getK(), yKappa));
 			kVec.push_back(1); //Generalize z component
-			eRTab.at(i).at(j) = ETildeBase(fVec, THETA, kVec);
+			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
             //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
@@ -156,7 +169,18 @@ int main(int argc, char** argv){
     		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * FourData.at(i).at(j).at(0);
     	}
     }
-          
+	
+	for (int j = 0; j < beam1.getRealE().size(); j++) {
+		for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
+			for (int k = 0; k < 3; k++) {
+				cout << eRTab.at(i).at(j).at(k) << " ";
+			}
+			cout << "\t";
+		}
+
+		cout << endl;
+	}
+        
 	cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
 	in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
@@ -218,9 +242,10 @@ int main(int argc, char** argv){
 	
 	for (int i = 0; i < outBeamMag.size(); i++) {
 		for (int j = 0; j < outBeamMag.at(0).size(); j++) {
-			nXrp1 += j * outBeamMag.at(i).at(j).at(0);
-			nYrp1 += i * outBeamMag.at(i).at(j).at(0);
+			nXrp1 += (j+1) * outBeamMag.at(i).at(j).at(0);
+			nYrp1 += (i+1) * outBeamMag.at(i).at(j).at(0);
 			denom += outBeamMag.at(i).at(j).at(0);
+			cout << nXrp1 << " " << nYrp1 << " " << denom << endl;
 		}
 	}
 
@@ -239,7 +264,7 @@ int main(int argc, char** argv){
 
 	cout << "Total time elapsed: " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
-    beam1.rootGraph(argc, argv, OGBeamMag);
-    beam1.rootGraph(argc, argv, outBeamMag);
+   // beam1.rootGraph(argc, argv, OGBeamMag);
+    //beam1.rootGraph(argc, argv, outBeamMag);
     return 0;
 }

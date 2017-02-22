@@ -207,7 +207,7 @@ int GaussianBeam::sign(double val) {
 	return 0;
 }
 
-void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
+/*void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double> > > Field){
     //Open root graphics
     TApplication theApp("App", &argc, argv);
     gStyle->SetOptStat(0);
@@ -233,3 +233,4 @@ void GaussianBeam::rootGraph(int argc, char** argv, vector<vector<vector<double>
     c1->Print("GBplots.pdf","pdf");
     theApp.Run();
 }
+*/
