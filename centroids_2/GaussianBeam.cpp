@@ -60,18 +60,17 @@ double GaussianBeam::calculateHermite(double x, unsigned int m) { //Calculates t
 }
 
 void GaussianBeam::calculateGaussData() {
-
 	double PI = 3.14159265;
 
 
-    dimset=11;
-    xMax=400000;
-   // xMax=.01;
-    xMin=-xMax;
-	xInt=2*xMax/(dimset-1);
-	yMax=xMax;
-	yMin=-yMax;
-	yInt=xInt;
+	dimset = 11;
+	xMax = 400000;
+	// xMax=.01;
+	xMin = -xMax;
+	xInt = 2 * xMax / (dimset - 1);
+	yMax = xMax;
+	yMin = -yMax;
+	yInt = xInt;
 
 	int xRange = (xMax - xMin) / xInt + 1;
 	int yRange = (yMax - yMin) / yInt + 1;
@@ -79,51 +78,76 @@ void GaussianBeam::calculateGaussData() {
 	for (int i = 0; i < xRange; i++) { //Populate xVals
 		double xCurr = xMin + i*xInt;
 		xVals.push_back(xCurr);
-       // cout << "New x: " << xCurr << endl;
+		// cout << "New x: " << xCurr << endl;
 	}
 
 	for (int i = 0; i < yRange; i++) { //Populate rVals
 		double yCurr = yMin + i*yInt;
 		yVals.push_back(yCurr);
-       // cout << "New y: " << yCurr << endl;
+		// cout << "New y: " << yCurr << endl;
 	}
 
 	double theZ; //Stores lower limit on distance from focus
-	theZ=.1;
+	theZ = .1;
 	zVals.push_back(theZ);
 
 	vector<vector<vector<double> > > ReLocal(xVals.size(), vector<vector<double> >(yVals.size(), vector<double>(zVals.size(), 0))); //Separate 3D vectors to hold real and imaginary parts of E-field
 
-    ReEField = ReLocal;
-    ImEField = ReLocal;
+	ReEField = ReLocal;
+	ImEField = ReLocal;
 
-	for (int m = 0; m < zVals.size(); ++m) {  //Weird choice, but this streamlines the program
-										  //These only vary with z, so we only need to calculate them once per loop
-		double gouy = calculateGouy(zVals.at(m));
-		double radCurv = calculateRadCurv(zVals.at(m));
-		double spotSize = calculateWaist(zVals.at(m));
+	/*for (int m = 0; m < zVals.size(); ++m) {  //Weird choice, but this streamlines the program
+	//These only vary with z, so we only need to calculate them once per loop
+	double gouy = calculateGouy(zVals.at(m));
+	double radCurv = calculateRadCurv(zVals.at(m));
+	double spotSize = calculateWaist(zVals.at(m));
 
-		for (int i = 0; i < xVals.size(); ++i) {
-			for (int j = 0; j < yVals.size(); ++j) {
+	for (int i = 0; i < xVals.size(); ++i) {
+	for (int j = 0; j < yVals.size(); ++j) {
 
-				double r = distance(xVals.at(i), yVals.at(j));
-				double t;
-				if (abs(yVals.at(j)) < PI*1e-10) t = PI - sign(xVals.at(i))*PI / 2;
-				else t = atan(xVals.at(i) / yVals.at(j));
+	double r = distance(xVals.at(i), yVals.at(j));
+	double t;
+	if (abs(yVals.at(j)) < PI*1e-10) t = PI - sign(xVals.at(i))*PI / 2;
+	else t = atan(xVals.at(i) / yVals.at(j));
 
-				double imArg = -(k* zVals.at(m) + k*(pow(r, 2) / (radCurv * 2)) + l*t - gouy);
-				complex<double> expArg(0.0, imArg);
-				//cout << expArg << endl;
+	double imArg = -(k* zVals.at(m) + k*(pow(r, 2) / (radCurv * 2)) + l*t - gouy);
+	complex<double> expArg(0.0, imArg);
+	//cout << expArg << endl;
 
-				complex<double> phasorOut; //Uncomment if we only want to consider real component of field			
-				phasorOut = laguerre(2*pow(r,2) / pow(spotSize,2), abs(l), p)*pow(sqrt(2)*r / spotSize, abs(l))*(1 / spotSize)*exp(-pow(r / spotSize, 2))*exp(expArg);
-				//cout << phasorOut << endl;
-				double realField = real(phasorOut);
-				double imagField = imag(phasorOut);
+	complex<double> phasorOut; //Uncomment if we only want to consider real component of field
+	phasorOut = laguerre(2*pow(r,2) / pow(spotSize,2), abs(l), p)*pow(sqrt(2)*r / spotSize, abs(l))*(1 / spotSize)*exp(-pow(r / spotSize, 2))*exp(expArg);
+	//cout << phasorOut << endl;
+	double realField = real(phasorOut);
+	double imagField = imag(phasorOut);
 
-				ReEField.at(i).at(j).at(m) = realField;
-				ImEField.at(i).at(j).at(m) = imagField;
-			}
+	ReEField.at(i).at(j).at(m) = realField;
+	ImEField.at(i).at(j).at(m) = imagField;
+	}
+	}
+	}*/
+
+	double omega = 20000 / k;
+
+	for (int i = 0; i < xVals.size(); ++i) {
+		for (int j = 0; j < yVals.size(); ++j) {
+
+			double r = distance(xVals.at(i), yVals.at(j));
+
+			double reArg = -pow(k, 2)*pow(r, 2) / (omega*pow(k, 2));
+			double imArg = 0;
+			if (abs(yVals.at(j)) < PI*1e-10) imArg = -l*(PI - sign(xVals.at(i))*PI / 2);
+			else imArg = -(l*atan(xVals.at(i) / yVals.at(j)));
+			complex<double> expArg(reArg, imArg);
+			cout << reArg << endl;
+
+			complex<double> phasorOut; //Uncomment if we only want to consider real component of field			
+			phasorOut = pow(2, abs(l) / 2)/ (omega * k) * exp(expArg) * k * pow(k / (omega * k * sqrt(1 / r)), abs(l)) * laguerre(p, abs(l), 2 * pow(r, 2) * pow(k, 2) / (omega*pow(k, 2)));
+			//cout << phasorOut << endl;
+			double realField = real(phasorOut);
+			double imagField = imag(phasorOut);
+
+			ReEField.at(i).at(j).at(0) = realField;
+			ImEField.at(i).at(j).at(0) = imagField;
 		}
 	}
 }
@@ -194,7 +218,7 @@ double GaussianBeam::getK()
 	return k;
 }
 
-double GaussianBeam::laguerre(double x, double alpha, double k) {
+double GaussianBeam::laguerre(double k, double alpha, double x) {
 	if (k == 0) return 1;
 	if (k == 1) return 1 + alpha - x;
 
