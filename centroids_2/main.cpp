@@ -148,17 +148,6 @@ int main(int argc, char** argv){
     	}
     }
 	
-	//for (int j = 0; j < beam1.getRealE().size(); j++) {
-	//	for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
-	//		for (int k = 0; k < 3; k++) {
-	//			cout << eRTab.at(i).at(j).at(k) << " ";
-	//		}
-	//		cout << "\t";
-	//	}
-
-	//	cout << endl;
-	//}
-        
 	cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
 	in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
