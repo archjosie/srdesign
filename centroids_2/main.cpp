@@ -61,9 +61,9 @@ vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vecto
 }
 
 int main(int argc, char** argv){
+    cout << "Starting Calculations" << endl;
     double k0 = 1;
     GaussianBeam beam1(20000/k0,2*PI,0,0);
-//    GaussianBeam beam1(1,1,0,0);
     beam1.calculateGaussData();
 
 	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
@@ -72,35 +72,12 @@ int main(int argc, char** argv){
     fVec.at(1)=0;
     fVec.at(2)=0;
 
-    //Generate the kappa table (using the step size found in the mathematica nb "Single interface Shifts")
-	vector<vector<vector<double> > > kPerpTab(beam1.getRealE().size(), vector<vector<double> >(beam1.getRealE().at(0).size(), vector<double> (3, 0)));
-	vector<vector<double> > kComp(beam1.getRealE().size(), vector<double>(beam1.getRealE().at(0).size()));
-	
+    //Define the max xKappa and yKappa values
 	double xKappa = findMax(beam1.getXVals());
 	double yKappa = findMax(beam1.getYVals());
 
 	time_t start = clock();
 	
-	//for (int i = 0; i < beam1.getRealE().size(); i++) {
-	//	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-	//		kPerpTab.at(i).at(j).at(0) = generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa);
-	//		kPerpTab.at(i).at(j).at(1) = generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa);
-	//		kPerpTab.at(i).at(j).at(2) = sqrt((1-pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2)- pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa), 2)));
-	//		kComp.at(i).at(j)= pow(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa),2)+pow(generateK(j+1, beam1.getRealE().at(0).size(), beam1.getK(), yKappa),2);
-    //        //cout << kPerpTab.at(i).at(j).at(0) << "," << kPerpTab.at(i).at(j).at(1) << "," << kPerpTab.at(i).at(j).at(2) << endl;
-	//	}
-	//}
-	
-	//for (int j = 0; j < beam1.getRealE().size(); j++) {
-	//	for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
-	//		for (int k = 0; k < 2; k++) {
-	//			cout << kPerpTab.at(i).at(j).at(k) << " ";
-	//		}
-	//		cout << "\t";
-	//	}
-
-	//	cout << endl;
-	//}
 	
     //Generate the input and output vectors for fftw
 	fftw_complex *in, *out, *in2, *out2;
@@ -115,6 +92,7 @@ int main(int argc, char** argv){
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0);
             //cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+            cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
