@@ -162,7 +162,7 @@ int main(int argc, char** argv){
 
     k = 0;
     for (int i = 0; i < ERTab.size(); i++) {
-        for (int j = 0; j < ERTab.at(0).size(); j++) 
+        for (int j = 0; j < ERTab.at(0).size(); j++){ 
 			inx[k][0] = ERTab.at(i).at(j).at(0).real();
 			inx[k][1] = ERTab.at(i).at(j).at(0).imag();
 
