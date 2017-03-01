@@ -91,7 +91,11 @@ int main(int argc, char** argv){
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0);
+<<<<<<< HEAD
             cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+=======
+            //cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+>>>>>>> b6b9c4e4d5050393a550e569e629667419882944
             //cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
 		}
