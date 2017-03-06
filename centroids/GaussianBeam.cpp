@@ -166,7 +166,7 @@ void GaussianBeam::calculateGaussData() {
 
 				ReEField.at(i).at(j).at(l) = realField;
 				ImEField.at(i).at(j).at(l) = imagField;
-			}
+		}
 		}
 	}
 	ofstream fout;

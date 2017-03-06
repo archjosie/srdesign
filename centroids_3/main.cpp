@@ -63,7 +63,7 @@ vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vecto
 int main(int argc, char** argv){
     cout << "Starting Calculations" << endl;
     double k0 = 1;
-    GaussianBeam beam1(20000/k0,2*PI,0,0);
+    GaussianBeam beam1(20/k0,2*PI,0,0);
     beam1.calculateGaussData();
 
 	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
@@ -91,7 +91,7 @@ int main(int argc, char** argv){
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0);
-            //cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+            cout << beam1.getRealE().at(i).at(j).at(0) << endl;
             //cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
 		}
@@ -145,8 +145,9 @@ int main(int argc, char** argv){
     		ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * FourData.at(i).at(j).at(0);
     		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * FourData.at(i).at(j).at(0);
     		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * FourData.at(i).at(j).at(0);
-			cout << "<" << ERTab.at(i).at(j).at(0) << "," << ERTab.at(i).at(j).at(1) << "," << ERTab.at(i).at(j).at(2) << ">" << endl;
-    	}
+			//cout << "<" << ERTab.at(i).at(j).at(0) << "," << ERTab.at(i).at(j).at(1) <<
+			//"," << ERTab.at(i).at(j).at(2) << ">" << endl;
+			}
     }
 	
 	cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
@@ -166,11 +167,11 @@ int main(int argc, char** argv){
 			inx[k][0] = ERTab.at(i).at(j).at(0).real();
 			inx[k][1] = ERTab.at(i).at(j).at(0).imag();
 
-			iny[k][0] = ERTab.at(i).at(j).at(0).real();
-			iny[k][1] = ERTab.at(i).at(j).at(0).imag();
+			iny[k][0] = ERTab.at(i).at(j).at(1).real();
+			iny[k][1] = ERTab.at(i).at(j).at(1).imag();
 
-			inz[k][0] = ERTab.at(i).at(j).at(0).real();
-			inz[k][1] = ERTab.at(i).at(j).at(0).imag();
+			inz[k][0] = ERTab.at(i).at(j).at(2).real();
+			inz[k][1] = ERTab.at(i).at(j).at(2).imag();
 			k++;
         }    
     }
@@ -203,8 +204,9 @@ int main(int argc, char** argv){
 				complex<double> entry3(outz[k][0], outz[k][1]);
 				fourEnt.push_back(entry3);
 				k++;
-				cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << endl;
-			}
+				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " <<
+				//fourEnt.at(2) << ">" << endl; }
+		    }
 		}
 	}
 
