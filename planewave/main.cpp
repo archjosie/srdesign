@@ -198,13 +198,13 @@ int main(int argc, char** argv){
         }    
     }
 
-    fftw_plan hx = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inx, outx, FFTW_BACKWARD, FFTW_MEASURE);
+    fftw_plan hx = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inx, outx, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(hx);
 
-	fftw_plan hy = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), iny, outy, FFTW_BACKWARD, FFTW_MEASURE);
+	fftw_plan hy = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), iny, outy, FFTW_BACKWARD, FFTW_ESTIMATE);
 	fftw_execute(hy);
 
-	fftw_plan hz = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inz, outz, FFTW_BACKWARD, FFTW_MEASURE);
+	fftw_plan hz = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inz, outz, FFTW_BACKWARD, FFTW_ESTIMATE);
 	fftw_execute(hz);
 
 	vector<vector<vector<complex<double> > > > outBeam(ERTab.size(), vector<vector<complex<double> > >(ERTab.at(0).size(), vector<complex<double> > (3, complex<double> (0,0))));
@@ -244,14 +244,14 @@ int main(int argc, char** argv){
 
 	cout << "Checkpoint: Heavy lifting complete. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
-    fftw_free(in);
-    fftw_free(out);
-    fftw_free(inx);
-    fftw_free(outx);
-	fftw_free(iny);
-	fftw_free(outy);
-	fftw_free(inz);
-	fftw_free(outz);
+    //fftw_free(in);
+    //fftw_free(out);
+    //fftw_free(inx);
+    //fftw_free(outx);
+	//fftw_free(iny);
+	//fftw_free(outy);
+	//fftw_free(inz);
+	//fftw_free(outz);
 
     fftw_destroy_plan(hx);
 	fftw_destroy_plan(hy);
