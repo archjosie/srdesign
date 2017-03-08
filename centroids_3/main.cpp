@@ -106,7 +106,7 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			complex<double> fourEnt(out[k][0], out[k][1]);
+			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()*beam1.getRealE().size()), out[k][1] / (beam1.getRealE().size()*beam1.getRealE().size()));
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
             //cout << FourData.at(i).at(j).at(0) << endl;
@@ -114,7 +114,19 @@ int main(int argc, char** argv){
 		}
 	}
 
-	cout << "Checkpoint: Fourier data created. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
+	for (int i = 0; i < FourData.size(); i++) {
+		for (int j = 0; j < (FourData.size() + 1) / 2 - 1; j++) {
+			FourData.at(i).at(j).swap(FourData.at(i).at(j + (FourData.size() + 1) / 2));
+		}
+	}
+
+	for (int i = 0; i < (FourData.size() + 1) / 2 - 1; i++) {
+		FourData.at(i).swap(FourData.at(i + (FourData.size() + 1) / 2));
+	}
+
+	for (int i = 0; i < FourData.size(); i++) for (int j = 0; j < FourData.at(0).size(); j++) cout << FourData.at(i).at(j).at(0) << endl;
+
+	cout << "Checkpoint: Fourier data created and rotated. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
     //From the Mathematica code:
     //eRtab = Table[eR /. {\[Kappa]x -> \[Kappa]tab[[i, j]][[1]], \[Kappa]y -> \[Kappa]tab[[i, j]][[2]]} /. params$here, {i, 1, dimset}, {j, 1, dimset}];
@@ -130,7 +142,7 @@ int main(int argc, char** argv){
 			kVec.push_back(generateK(j+1, beam1.getRealE().size(), beam1.getK(), yKappa));
 			kVec.push_back(1); //Generalize z component
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
-            cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
+            //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
 	
