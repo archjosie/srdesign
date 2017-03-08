@@ -89,9 +89,9 @@ int main(int argc, char** argv){
 	int k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			in[k][0] = beam1.getRealE().at(i).at(j).at(0);
-			in[k][1] = beam1.getImE().at(i).at(j).at(0);
-            cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+			in[k][0] = beam1.getRealE().at(i).at(j).at(0)*exp(-100);
+			in[k][1] = beam1.getImE().at(i).at(j).at(0)*exp(-100);
+            //cout << beam1.getRealE().at(i).at(j).at(0) << endl;
             //cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
 		}
@@ -130,7 +130,7 @@ int main(int argc, char** argv){
 			kVec.push_back(generateK(j+1, beam1.getRealE().size(), beam1.getK(), yKappa));
 			kVec.push_back(1); //Generalize z component
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
-            //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
+            cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
 	
