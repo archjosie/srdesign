@@ -144,7 +144,7 @@ int main(int argc, char** argv){
 			kVec.push_back(generateK(j+1, beam1.getRealE().size(), beam1.getK(), yKappa));
 			kVec.push_back(1); //Generalize z component
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
-			//cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
+			cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
             //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
