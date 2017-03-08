@@ -15,6 +15,7 @@ complex<double> rTE(double n, double theta, vector<double> kvec){
     nvec.push_back(cos(theta));
 
     double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
+	cout << beta << endl;
 	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
 	complex<double> ans = (cos(beta) - sqrt(arg)) / (cos(beta) + sqrt(arg));
 	return ans;
@@ -28,6 +29,7 @@ complex<double> rTM(double n, double theta, vector<double> kvec){
     nvec.push_back(cos(theta));
 
     double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
+	cout << beta << endl;
 	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
 	complex<double> ans = (pow(n,2)*cos(beta)-sqrt(arg))/(pow(n,2)*cos(beta)+sqrt(arg));
 	return ans;
@@ -55,7 +57,7 @@ vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vecto
 	theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
 	theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
-    //cout << "(" << real(rTM(NVAL, theta, REkVecs)) << "," << imag(rTM(NVAL, theta, REkVecs)) << ")\t(" << real(rTE(NVAL, theta, REkVecs)) << "," <<  real(rTM(NVAL, theta, REkVecs)) << ")" << endl;
+    //cout << "(" << real(rTM(NVAL, theta, REkVecs)) << "," << imag(rTM(NVAL, theta, REkVecs)) << ")\t(" << real(rTE(NVAL, theta, REkVecs)) << "," <<  imag(rTE(NVAL, theta, REkVecs)) << ")" << endl;
 
 	return theVec;
 }
@@ -106,7 +108,7 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()*beam1.getRealE().size()), out[k][1] / (beam1.getRealE().size()*beam1.getRealE().size()));
+			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()), out[k][1] / (beam1.getRealE().size()));
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
             //cout << FourData.at(i).at(j).at(0) << endl;
@@ -124,9 +126,9 @@ int main(int argc, char** argv){
 		FourData.at(i).swap(FourData.at(i + (FourData.size() + 1) / 2));
 	}
 
-	for (int i = 0; i < FourData.size(); i++) for (int j = 0; j < FourData.at(0).size(); j++) cout << FourData.at(i).at(j).at(0) << endl;
+	//for (int i = 0; i < FourData.size(); i++) for (int j = 0; j < FourData.at(0).size(); j++) cout << FourData.at(i).at(j).at(0) << endl;
 
-	cout << "Checkpoint: Fourier data created and rotated. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
+	//cout << "Checkpoint: Fourier data created and rotated. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
     //From the Mathematica code:
     //eRtab = Table[eR /. {\[Kappa]x -> \[Kappa]tab[[i, j]][[1]], \[Kappa]y -> \[Kappa]tab[[i, j]][[2]]} /. params$here, {i, 1, dimset}, {j, 1, dimset}];
@@ -137,11 +139,12 @@ int main(int argc, char** argv){
 
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			vector<double> kVec;
+			vector<double> kVec = vector<double> (0,0);
 			kVec.push_back(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa));
 			kVec.push_back(generateK(j+1, beam1.getRealE().size(), beam1.getK(), yKappa));
 			kVec.push_back(1); //Generalize z component
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
+			//cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
             //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 		}
 	}
@@ -157,8 +160,7 @@ int main(int argc, char** argv){
     		ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * FourData.at(i).at(j).at(0);
     		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * FourData.at(i).at(j).at(0);
     		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * FourData.at(i).at(j).at(0);
-			//cout << "<" << ERTab.at(i).at(j).at(0) << "," << ERTab.at(i).at(j).at(1) <<
-			//"," << ERTab.at(i).at(j).at(2) << ">" << endl;
+			//cout << "<" << ERTab.at(i).at(j).at(0) << "," << ERTab.at(i).at(j).at(1) <<	"," << ERTab.at(i).at(j).at(2) << ">" << endl;
 			}
     }
 	
