@@ -15,7 +15,7 @@ complex<double> rTE(double n, double theta, vector<double> kvec){
     nvec.push_back(cos(theta));
 
     double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
-	cout << beta << endl;
+	//cout << beta << endl;
 	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
 	complex<double> ans = (cos(beta) - sqrt(arg)) / (cos(beta) + sqrt(arg));
 	return ans;
@@ -29,7 +29,7 @@ complex<double> rTM(double n, double theta, vector<double> kvec){
     nvec.push_back(cos(theta));
 
     double beta= acos(nvec.at(0)*kvec.at(0)+nvec.at(1)*kvec.at(1)+nvec.at(2)*kvec.at(2));
-	cout << beta << endl;
+	//cout << beta << endl;
 	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
 	complex<double> ans = (pow(n,2)*cos(beta)-sqrt(arg))/(pow(n,2)*cos(beta)+sqrt(arg));
 	return ans;
@@ -140,9 +140,12 @@ int main(int argc, char** argv){
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			vector<double> kVec = vector<double> (0,0);
+			double kx = generateK(i + 1, beam1.getRealE().size(), beam1.getK(), xKappa);
+			double ky = generateK(j + 1, beam1.getRealE().size(), beam1.getK(), yKappa);
+
 			kVec.push_back(generateK(i+1, beam1.getRealE().size(), beam1.getK(), xKappa));
 			kVec.push_back(generateK(j+1, beam1.getRealE().size(), beam1.getK(), yKappa));
-			kVec.push_back(1); //Generalize z component
+			kVec.push_back(sqrt(1-pow(kx,2)-pow(ky,2))); //Generalize z component
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
 			//cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
             //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
