@@ -62,6 +62,11 @@ vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vecto
 	return theVec;
 }
 
+double chop(double num) {
+	if (abs(num) < 1e-12) return 0;
+	return num;
+}
+
 int main(int argc, char** argv){
     cout << "Starting Calculations" << endl;
     double k0 = 1;
@@ -73,6 +78,13 @@ int main(int argc, char** argv){
     fVec.at(0)=1;
     fVec.at(1)=0;
     fVec.at(2)=0;
+
+	ofstream fout;
+	fout.open("waveTest.txt");
+	if (fout.fail()) {
+		cerr << "Something went wrong" << endl;
+		exit(1);
+	}
 
     //Define the max xKappa and yKappa values
 	double xKappa = findMax(beam1.getXVals());
@@ -108,7 +120,7 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()), out[k][1] / (beam1.getRealE().size()));
+			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()), -out[k][1] / (beam1.getRealE().size()));
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
             //cout << FourData.at(i).at(j).at(0) << endl;
@@ -117,15 +129,17 @@ int main(int argc, char** argv){
 	}
 
 	for (int i = 0; i < FourData.size(); i++) {
-		for (int j = 0; j < (FourData.size() + 1) / 2 - 1; j++) {
-			FourData.at(i).at(j).swap(FourData.at(i).at(j + (FourData.size() + 1) / 2));
+		for (int j = 0; j < (FourData.size() + 1) / 2; j++) {
+			FourData.at(i).push_back(FourData.at(i).at(0));
+			FourData.at(i).erase(FourData.at(i).begin());
 		}
 	}
 
-	for (int i = 0; i < (FourData.size() + 1) / 2 - 1; i++) {
-		FourData.at(i).swap(FourData.at(i + (FourData.size() + 1) / 2));
+	for (int i = 0; i < (FourData.size() + 1) / 2; i++) {
+		FourData.push_back(FourData.at(0));
+		FourData.erase(FourData.begin());
 	}
-
+	
 	//for (int i = 0; i < FourData.size(); i++) for (int j = 0; j < FourData.at(0).size(); j++) cout << FourData.at(i).at(j).at(0) << endl;
 
 	//cout << "Checkpoint: Fourier data created and rotated. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
@@ -137,8 +151,8 @@ int main(int argc, char** argv){
 
 	vector<vector<vector<complex<double> > > > eRTab(beam1.getRealE().size(), vector<vector<complex<double> > >(beam1.getRealE().at(0).size(), vector<complex<double> >(3, complex<double>(0, 0))));
 
-	for (int i = 0; i < beam1.getRealE().size(); i++) {
-		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
+	for (int j = 0; j < beam1.getRealE().size(); j++) {
+		for (int i = 0; i < beam1.getRealE().at(0).size(); i++) {
 			vector<double> kVec = vector<double> (0,0);
 			double kx = generateK(i + 1, beam1.getRealE().size(), beam1.getK(), xKappa);
 			double ky = generateK(j + 1, beam1.getRealE().size(), beam1.getK(), yKappa);
@@ -147,10 +161,11 @@ int main(int argc, char** argv){
 			kVec.push_back(generateK(j+1, beam1.getRealE().size(), beam1.getK(), yKappa));
 			kVec.push_back(sqrt(1-pow(kx,2)-pow(ky,2))); //Generalize z component
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
-			cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
-            //cout << "<" << eRTab.at(i).at(j).at(0)<< "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
+			//cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
 		}
 	}
+
+	//for (int j = 0; j < beam1.getRealE().size(); j++) for (int i = 0; i < beam1.getRealE().at(0).size(); i++)	cout << "<" << eRTab.at(i).at(j).at(0) << "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 	
 	cout << "Checkpoint: ETilde generated. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
     //Now we can use the eRtab and the fourier data "out" (E$Tilde in the
@@ -160,13 +175,14 @@ int main(int argc, char** argv){
 
     for (int i = 0; i < beam1.getRealE().size(); i++) {
     	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-    		ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * FourData.at(i).at(j).at(0);
-    		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * FourData.at(i).at(j).at(0);
-    		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * FourData.at(i).at(j).at(0);
-			//cout << "<" << ERTab.at(i).at(j).at(0) << "," << ERTab.at(i).at(j).at(1) <<	"," << ERTab.at(i).at(j).at(2) << ">" << endl;
+    		ERTab.at(i).at(j).at(0) = eRTab.at(j).at(i).at(0) * FourData.at(i).at(j).at(0);
+    		ERTab.at(i).at(j).at(1) = eRTab.at(j).at(i).at(1) * FourData.at(i).at(j).at(0);
+    		ERTab.at(i).at(j).at(2) = eRTab.at(j).at(i).at(2) * FourData.at(i).at(j).at(0);
+			if (i == 5 && j == 5) cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
 			}
     }
 	
+	//DO NOT CHANGE ANYTHING ABOVE THIS LINE!! AS FAR AS WE KNOW, IT'S WORKING FINE!
 	cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
 	inx = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
@@ -181,14 +197,14 @@ int main(int argc, char** argv){
     k = 0;
     for (int i = 0; i < ERTab.size(); i++) {
         for (int j = 0; j < ERTab.at(0).size(); j++){ 
-			inx[k][0] = ERTab.at(i).at(j).at(0).real();
-			inx[k][1] = ERTab.at(i).at(j).at(0).imag();
+			inx[k][0] = real(ERTab.at(i).at(j).at(0));
+			inx[k][1] = imag(ERTab.at(i).at(j).at(0));
 
-			iny[k][0] = ERTab.at(i).at(j).at(1).real();
-			iny[k][1] = ERTab.at(i).at(j).at(1).imag();
+			iny[k][0] = real(ERTab.at(i).at(j).at(1));
+			iny[k][1] = imag(ERTab.at(i).at(j).at(1));
 
-			inz[k][0] = ERTab.at(i).at(j).at(2).real();
-			inz[k][1] = ERTab.at(i).at(j).at(2).imag();
+			inz[k][0] = real(ERTab.at(i).at(j).at(2));
+			inz[k][1] = imag(ERTab.at(i).at(j).at(2));
 			k++;
         }    
     }
@@ -207,23 +223,24 @@ int main(int argc, char** argv){
 	vector<vector<vector<double> > > outBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(3, 0)));
 	vector<vector<vector<double> > > OGBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
 
+	cout << "After IFT:" << endl;
+
 	k = 0;
 	for (int i = 0; i < ERTab.size(); i++) {
 		for (int j = 0; j < ERTab.at(0).size(); j++) {
-			for (int l = 0; l < 3; l++) {
 				vector<complex<double> > fourEnt;
-				complex<double> entry1(outx[k][0], outx[k][1]);
+				complex<double> entry1(outx[k][0] / ERTab.size(), outx[k][1] / ERTab.size());
 				fourEnt.push_back(entry1);
 
-				complex<double> entry2(outy[k][0], outy[k][1]);
+				complex<double> entry2(outy[k][0] / ERTab.size(), outy[k][1] / ERTab.size());
 				fourEnt.push_back(entry2);
 
-				complex<double> entry3(outz[k][0], outz[k][1]);
+				complex<double> entry3(outz[k][0] / ERTab.size(), outz[k][1] / ERTab.size());
 				fourEnt.push_back(entry3);
 				k++;
-				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " <<
-				//fourEnt.at(2) << ">" << endl; }
-		    }
+
+				outBeam.at(i).at(j) = fourEnt;
+				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << endl;
 		}
 	}
 
@@ -252,6 +269,8 @@ int main(int argc, char** argv){
 	fftw_destroy_plan(hy);
 	fftw_destroy_plan(hz);
     fftw_destroy_plan(g);
+
+	fout.close();
 
     //Calculate magnitude of both beams for comparision
 	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) for (int l = 0; l < 3; l++)

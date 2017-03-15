@@ -130,7 +130,6 @@ void GaussianBeam::calculateGaussData() {
 
 	for (int i = 0; i < xVals.size(); ++i) {
 		for (int j = 0; j < yVals.size(); ++j) {
-
 			double r = distance(xVals.at(i), yVals.at(j));
 
 			double reArg = -pow(k, 2)*pow(r, 2) / (pow(omega*k, 2));
@@ -138,15 +137,17 @@ void GaussianBeam::calculateGaussData() {
 			if (abs(yVals.at(j)) < PI*1e-10) imArg = -l*(PI - sign(xVals.at(i))*PI / 2);
 			else imArg = -(l*atan(xVals.at(i) / yVals.at(j)));
 			//cout << reArg << endl;
-
+			
 			complex<double> phasorOut; //Uncomment if we only want to consider real component of field			
 			phasorOut = pow(2, abs(l) / 2)/ (omega * k) * exp(reArg+100) * k * pow(k / (omega * k * sqrt(1 / r)), abs(l)) * laguerre(p, abs(l), 2 * pow(r, 2) * pow(k, 2) / (pow(omega*k, 2)));
 			//cout << phasorOut << endl;
+			
 			double realField = real(phasorOut);
 			double imagField = imag(phasorOut);
 
 			ReEField.at(i).at(j).at(0) = realField;
 			ImEField.at(i).at(j).at(0) = imagField;
+			
 		}
 	}
 }
