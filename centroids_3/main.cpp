@@ -120,10 +120,10 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()), -out[k][1] / (beam1.getRealE().size()));
+			complex<double> fourEnt(chop(out[k][0]) / (beam1.getRealE().size()), chop(out[k][1]) / (beam1.getRealE().size()));
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
-            //cout << FourData.at(i).at(j).at(0) << endl;
+            cout << FourData.at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -175,10 +175,10 @@ int main(int argc, char** argv){
 
     for (int i = 0; i < beam1.getRealE().size(); i++) {
     	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-    		ERTab.at(i).at(j).at(0) = eRTab.at(j).at(i).at(0) * FourData.at(i).at(j).at(0);
-    		ERTab.at(i).at(j).at(1) = eRTab.at(j).at(i).at(1) * FourData.at(i).at(j).at(0);
-    		ERTab.at(i).at(j).at(2) = eRTab.at(j).at(i).at(2) * FourData.at(i).at(j).at(0);
-			if (i == 5 && j == 5) cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
+    		ERTab.at(i).at(j).at(0) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(0) * 
+    		ERTab.at(i).at(j).at(1) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(1) * 
+    		ERTab.at(i).at(j).at(2) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(2) * 
+//			if (i == 5 && j == 5) cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
 			}
     }
 	
