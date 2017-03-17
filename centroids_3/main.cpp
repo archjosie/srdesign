@@ -105,10 +105,11 @@ int main(int argc, char** argv){
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0)*exp(-100);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0)*exp(-100);
-            //cout << beam1.getRealE().at(i).at(j).at(0) << endl;
+            cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)*exp(-100)) << "," << chop(beam1.getImE().at(i).at(j).at(0)*exp(-100)) << ">" << "\t"; 
             //cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
 		}
+        cout << endl;
 	}
 
 	cout << "Checkpoint: Fourier array prepared. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
@@ -120,10 +121,10 @@ int main(int argc, char** argv){
 	k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			complex<double> fourEnt(chop(out[k][0]) / (beam1.getRealE().size()), chop(out[k][1]) / (beam1.getRealE().size()));
+			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()), out[k][1] / (beam1.getRealE().size()));
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
-            cout << FourData.at(i).at(j).at(0) << endl;
+            //cout << FourData.at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -178,9 +179,11 @@ int main(int argc, char** argv){
     		ERTab.at(i).at(j).at(0) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(0) * 
     		ERTab.at(i).at(j).at(1) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(1) * 
     		ERTab.at(i).at(j).at(2) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(2) * 
-//			if (i == 5 && j == 5) cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
+//			cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
 			}
     }
+
+    //cout << "<(" << chop(real(ERTab.at(5).at(5).at(0))) << "," << chop(imag(ERTab.at(5).at(5).at(0))) << "), (" << chop(real(ERTab.at(5).at(5).at(1))) << "," << chop(imag(ERTab.at(5).at(5).at(1))) << "), (" << chop(real(ERTab.at(5).at(5).at(2))) << "," << chop(imag(ERTab.at(5).at(5).at(2))) << ")>" << endl;
 	
 	//DO NOT CHANGE ANYTHING ABOVE THIS LINE!! AS FAR AS WE KNOW, IT'S WORKING FINE!
 	cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
@@ -241,7 +244,9 @@ int main(int argc, char** argv){
 
 				outBeam.at(i).at(j) = fourEnt;
 				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << endl;
+				cout << "<" << chop(fourEnt.at(0).real()) << "," << chop(fourEnt.at(0).real()) << ">" << "\t";
 		}
+        cout << endl;
 	}
 
 	k = 0;
