@@ -72,6 +72,7 @@ int main(int argc, char** argv){
     double k0 = 1;
     GaussianBeam beam1(20/k0,2*PI,0,0);
     beam1.calculateGaussData();
+	//cout << "<" << beam1.getRealE().at(0).at(0).at(0) << " ," << beam1.getImE().at(0).at(0).at(0) << ">" << endl;
 
 	//Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
     vector<complex<double> > fVec(3, complex<double>(0, 0));
@@ -94,7 +95,7 @@ int main(int argc, char** argv){
 	
 	
     //Generate the input and output vectors for fftw
-	fftw_complex *in, *out, *inx, *outx, *iny, *outy, *inz, *outz;
+	fftw_complex *in, *out, *inx, *outx, *iny, *outy, *inz, *outz, *in3, *out3;
 	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 	out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * beam1.getRealE().size() * beam1.getRealE().at(0).size());
 
@@ -103,14 +104,14 @@ int main(int argc, char** argv){
 	int k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			in[k][0] = beam1.getRealE().at(i).at(j).at(0);//*exp(-100);
-			in[k][1] = beam1.getImE().at(i).at(j).at(0);//*exp(-100);
-            cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)) << "," << chop(beam1.getImE().at(i).at(j).at(0)) << ">" << "\t"; 
+			in[k][0] = beam1.getRealE().at(i).at(j).at(0)*exp(-100);
+			in[k][1] = beam1.getImE().at(i).at(j).at(0)*exp(-100);
+            //cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)) << "," << chop(beam1.getImE().at(i).at(j).at(0)) << ">" << "\t"; 
             //cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)*exp(-100)) << "," << chop(beam1.getImE().at(i).at(j).at(0)*exp(-100)) << ">" << "\t"; 
             //cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
 		}
-        cout << endl;
+       // cout << endl;
 	}
 
 	cout << "Checkpoint: Fourier array prepared. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
@@ -125,7 +126,7 @@ int main(int argc, char** argv){
 			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()), out[k][1] / (beam1.getRealE().size()));
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
-            cout << FourData.at(i).at(j).at(0) << endl;
+            //cout << FourData.at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -141,6 +142,8 @@ int main(int argc, char** argv){
 		FourData.push_back(FourData.at(0));
 		FourData.erase(FourData.begin());
 	}
+
+	//cout << FourData.at(0).at(0).at(0) << endl;
 	
 	//for (int i = 0; i < FourData.size(); i++) for (int j = 0; j < FourData.at(0).size(); j++) cout << FourData.at(i).at(j).at(0) << endl;
 
@@ -164,9 +167,11 @@ int main(int argc, char** argv){
 			kVec.push_back(sqrt(1-pow(kx,2)-pow(ky,2))); //Generalize z component
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
 			//cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
+			//cout << "<" << eRTab.at(i).at(j).at(0).real() << "," << eRTab.at(i).at(j).at(0).imag() << ">" << endl;
 		}
 	}
 
+	//cout << "<" << eRTab.at(0).at(0).at(0) << "," << eRTab.at(0).at(0).at(1) << "," << eRTab.at(0).at(0).at(2) << ">" << endl;
 	//for (int j = 0; j < beam1.getRealE().size(); j++) for (int i = 0; i < beam1.getRealE().at(0).size(); i++)	cout << "<" << eRTab.at(i).at(j).at(0) << "," << eRTab.at(i).at(j).at(1) << "," << eRTab.at(i).at(j).at(2) << ">" << endl;
 	
 	cout << "Checkpoint: ETilde generated. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
@@ -177,10 +182,12 @@ int main(int argc, char** argv){
 
     for (int i = 0; i < beam1.getRealE().size(); i++) {
     	for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-    		ERTab.at(i).at(j).at(0) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(0) * 
-    		ERTab.at(i).at(j).at(1) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(1) * 
-    		ERTab.at(i).at(j).at(2) = FourData.at(i).at(j).at(0);//eRTab.at(j).at(i).at(2) * 
-//			cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
+			complex<double> fourPoint(FourData.at(i).at(j).at(0).real(), -FourData.at(i).at(j).at(0).imag());
+
+    		ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * fourPoint;
+    		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
+    		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
+			//cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
 			}
     }
 
@@ -198,20 +205,40 @@ int main(int argc, char** argv){
 	inz = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
 	outz = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
 
+	in3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
+	out3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
+
     k = 0;
-    for (int j = 0; j < ERTab.size(); j++) {
-        for (int i = 0; i < ERTab.at(0).size(); i++){ 
+    for (int i = 0; i < ERTab.size(); i++) {
+        for (int j = 0; j < ERTab.at(0).size(); j++){ 
 			inx[k][0] = real(ERTab.at(i).at(j).at(0));
-			inx[k][1] = imag(ERTab.at(i).at(j).at(0));
+			inx[k][1] = -imag(ERTab.at(i).at(j).at(0));
 
 			iny[k][0] = real(ERTab.at(i).at(j).at(1));
-			iny[k][1] = imag(ERTab.at(i).at(j).at(1));
+			iny[k][1] = -imag(ERTab.at(i).at(j).at(1));
 
 			inz[k][0] = real(ERTab.at(i).at(j).at(2));
-			inz[k][1] = imag(ERTab.at(i).at(j).at(2));
+			inz[k][1] = -imag(ERTab.at(i).at(j).at(2));
 			k++;
         }    
     }
+
+	k = 0;
+	for (int i = 0; i < ERTab.size(); i++) {
+		for (int j = 0; j < ERTab.at(0).size(); j++) {
+			in3[k][0] = real(ERTab.at(i).at(j).at(0));
+			in3[k][1] = -imag(ERTab.at(i).at(j).at(0));
+			k++;
+
+			in3[k][0] = real(ERTab.at(i).at(j).at(1));
+			in3[k][1] = -imag(ERTab.at(i).at(j).at(1));
+			k++;
+
+			in3[k][0] = real(ERTab.at(i).at(j).at(2));
+			in3[k][1] = -imag(ERTab.at(i).at(j).at(2));
+			k++;
+		}
+	}
 
     fftw_plan hx = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inx, outx, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(hx);
@@ -222,9 +249,12 @@ int main(int argc, char** argv){
 	fftw_plan hz = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inz, outz, FFTW_BACKWARD, FFTW_ESTIMATE);
 	fftw_execute(hz);
 
+	fftw_plan h3 = fftw_plan_dft_3d(ERTab.size(), ERTab.at(0).size(), 3, in3, out3, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_execute(h3);
+
 	vector<vector<vector<complex<double> > > > outBeam(ERTab.size(), vector<vector<complex<double> > >(ERTab.at(0).size(), vector<complex<double> > (3, complex<double> (0,0))));
     vector<vector<vector<double> > > REoutBeam(ERTab.size(), vector<vector<double> > (ERTab.at(0).size(), vector<double> (3,0)));
-	vector<vector<vector<double> > > outBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(3, 0)));
+	vector<vector<vector<double> > > outBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
 	vector<vector<vector<double> > > OGBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
 
 	cout << "After IFT:" << endl;
@@ -233,7 +263,7 @@ int main(int argc, char** argv){
 	for (int i = 0; i < ERTab.size(); i++) {
 		for (int j = 0; j < ERTab.at(0).size(); j++) {
 				vector<complex<double> > fourEnt;
-				complex<double> entry1(outx[k][0] / ERTab.size(), outx[k][1] / ERTab.size());
+				/*complex<double> entry1(outx[k][0] / ERTab.size(), outx[k][1] / ERTab.size());
 				fourEnt.push_back(entry1);
 
 				complex<double> entry2(outy[k][0] / ERTab.size(), outy[k][1] / ERTab.size());
@@ -242,13 +272,25 @@ int main(int argc, char** argv){
 				complex<double> entry3(outz[k][0] / ERTab.size(), outz[k][1] / ERTab.size());
 				fourEnt.push_back(entry3);
 				k++;
+				*/
+				complex<double> entry1(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
+				fourEnt.push_back(entry1);
+				k++;
+
+				complex<double> entry2(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
+				fourEnt.push_back(entry2);
+				k++;
+
+				complex<double> entry3(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
+				fourEnt.push_back(entry3);
+				k++;
 
 				outBeam.at(i).at(j) = fourEnt;
-				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << "\t";
-				cout << "<" << chop(fourEnt.at(0).real()) << ", " << chop(fourEnt.at(0).imag()) << ", " << ">" << "\t";
+				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << endl;
+				//cout << "<" << chop(fourEnt.at(0).real()) << ", " << chop(fourEnt.at(0).imag()) << ", " << ">" << "\t";
 				//cout << "<" << chop(sqrt(pow(fourEnt.at(0).real(),2) + pow(fourEnt.at(0).imag(),2))) << ">" << "\t";
 		}
-        cout << endl;
+        //cout << endl;
 	}
 
 	k = 0;
@@ -271,17 +313,20 @@ int main(int argc, char** argv){
 	fftw_free(outy);
 	fftw_free(inz);
 	fftw_free(outz);
+	fftw_free(in3);
+	fftw_free(out3);
 
     fftw_destroy_plan(hx);
 	fftw_destroy_plan(hy);
 	fftw_destroy_plan(hz);
+	fftw_destroy_plan(h3);
     fftw_destroy_plan(g);
 
 	fout.close();
 
     //Calculate magnitude of both beams for comparision
-	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) for (int l = 0; l < 3; l++)
-		outBeamMag.at(i).at(j).at(l) = sqrt(real(outBeam.at(i).at(j).at(l) * conj(outBeam.at(i).at(j).at(l))));
+	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
+		outBeamMag.at(i).at(j).at(0) = sqrt(real(outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0))) + real(outBeam.at(i).at(j).at(1) * conj(outBeam.at(i).at(j).at(1))) + real(outBeam.at(i).at(j).at(2) * conj(outBeam.at(i).at(j).at(2))));
 
 	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
 		OGBeamMag.at(i).at(j).at(0) = sqrt(pow(beam1.getRealE().at(i).at(j).at(0),2) + pow(beam1.getImE().at(i).at(j).at(0),2));
@@ -291,12 +336,11 @@ int main(int argc, char** argv){
 	
 	for (int i = 0; i < outBeamMag.size(); i++) {
 		for (int j = 0; j < outBeamMag.at(0).size(); j++) {
-			for (int l = 0; l < 3; l++) {
-				nXrp1 += (j + 1) * outBeamMag.at(i).at(j).at(l);
-				nYrp1 += (i + 1) * outBeamMag.at(i).at(j).at(l);
-				denom += outBeamMag.at(i).at(j).at(l);
+				//cout << (i + 1) * pow(outBeamMag.at(j).at(i).at(0), 2) << endl;
+				nXrp1 += (j + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
+				nYrp1 += (i + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
+				denom += pow(outBeamMag.at(i).at(j).at(0), 2);
 				//cout << nXrp1 << " " << nYrp1 << " " << denom << endl;
-			}
 		}
 	}
 
