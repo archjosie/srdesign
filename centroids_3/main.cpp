@@ -103,9 +103,10 @@ int main(int argc, char** argv){
 	int k = 0;
 	for (int i = 0; i < beam1.getRealE().size(); i++) {
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
-			in[k][0] = beam1.getRealE().at(i).at(j).at(0)*exp(-100);
-			in[k][1] = beam1.getImE().at(i).at(j).at(0)*exp(-100);
-            cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)*exp(-100)) << "," << chop(beam1.getImE().at(i).at(j).at(0)*exp(-100)) << ">" << "\t"; 
+			in[k][0] = beam1.getRealE().at(i).at(j).at(0);//*exp(-100);
+			in[k][1] = beam1.getImE().at(i).at(j).at(0);//*exp(-100);
+            //cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)) << "," << chop(beam1.getImE().at(i).at(j).at(0)) << ">" << "\t"; 
+            //cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)*exp(-100)) << "," << chop(beam1.getImE().at(i).at(j).at(0)*exp(-100)) << ">" << "\t"; 
             //cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
 		}
@@ -124,7 +125,7 @@ int main(int argc, char** argv){
 			complex<double> fourEnt(out[k][0] / (beam1.getRealE().size()), out[k][1] / (beam1.getRealE().size()));
 			FourData.at(i).at(j).at(0) = fourEnt;
             if (pow(generateK(i, beam1.getRealE().size(), beam1.getK(), xKappa),2) + pow(generateK(j, beam1.getRealE().size(), beam1.getK(), yKappa),2) >= 1.0) FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
-            //cout << FourData.at(i).at(j).at(0) << endl;
+            cout << FourData.at(i).at(j).at(0) << endl;
 			k++;
 		}
 	}
@@ -244,7 +245,7 @@ int main(int argc, char** argv){
 
 				outBeam.at(i).at(j) = fourEnt;
 				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << endl;
-				cout << "<" << chop(fourEnt.at(0).real()) << "," << chop(fourEnt.at(0).real()) << ">" << "\t";
+				cout << "<" << chop(sqrt(pow(fourEnt.at(0).real(),2) + pow(fourEnt.at(0).real(),2))) << ">" << "\t";
 		}
         cout << endl;
 	}
