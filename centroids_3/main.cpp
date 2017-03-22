@@ -105,7 +105,7 @@ int main(int argc, char** argv){
 		for (int j = 0; j < beam1.getRealE().at(0).size(); j++) {
 			in[k][0] = beam1.getRealE().at(i).at(j).at(0);//*exp(-100);
 			in[k][1] = beam1.getImE().at(i).at(j).at(0);//*exp(-100);
-            //cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)) << "," << chop(beam1.getImE().at(i).at(j).at(0)) << ">" << "\t"; 
+            cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)) << "," << chop(beam1.getImE().at(i).at(j).at(0)) << ">" << "\t"; 
             //cout << "<" << chop(beam1.getRealE().at(i).at(j).at(0)*exp(-100)) << "," << chop(beam1.getImE().at(i).at(j).at(0)*exp(-100)) << ">" << "\t"; 
             //cout << beam1.getImE().at(i).at(j).at(0) << endl;
 			k++;
@@ -199,8 +199,8 @@ int main(int argc, char** argv){
 	outz = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
 
     k = 0;
-    for (int i = 0; i < ERTab.size(); i++) {
-        for (int j = 0; j < ERTab.at(0).size(); j++){ 
+    for (int j = 0; j < ERTab.size(); j++) {
+        for (int i = 0; i < ERTab.at(0).size(); i++){ 
 			inx[k][0] = real(ERTab.at(i).at(j).at(0));
 			inx[k][1] = imag(ERTab.at(i).at(j).at(0));
 
@@ -244,8 +244,9 @@ int main(int argc, char** argv){
 				k++;
 
 				outBeam.at(i).at(j) = fourEnt;
-				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << endl;
-				cout << "<" << chop(sqrt(pow(fourEnt.at(0).real(),2) + pow(fourEnt.at(0).real(),2))) << ">" << "\t";
+				//cout << "<" << fourEnt.at(0) << ", " << fourEnt.at(1) << ", " << fourEnt.at(2) << ">" << "\t";
+				cout << "<" << chop(fourEnt.at(0).real()) << ", " << chop(fourEnt.at(0).imag()) << ", " << ">" << "\t";
+				//cout << "<" << chop(sqrt(pow(fourEnt.at(0).real(),2) + pow(fourEnt.at(0).imag(),2))) << ">" << "\t";
 		}
         cout << endl;
 	}
