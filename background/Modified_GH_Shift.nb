@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    160895,       3687]
-NotebookOptionsPosition[    158107,       3590]
-NotebookOutlinePosition[    158461,       3606]
-CellTagsIndexPosition[    158418,       3603]
+NotebookDataLength[    161134,       3692]
+NotebookOptionsPosition[    158382,       3596]
+NotebookOutlinePosition[    158743,       3612]
+CellTagsIndexPosition[    158700,       3609]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -897,8 +897,7 @@ Cell[BoxData[
   3.678639673762134*^9}, {3.697379661163632*^9, 3.697379686507423*^9}}],
 
 Cell[BoxData[
- RowBox[{
-  FractionBox["1", "wk"], 
+ FractionBox[
   RowBox[{
    SuperscriptBox["2", 
     FractionBox[
@@ -937,7 +936,7 @@ Cell[BoxData[
         RowBox[{
          SuperscriptBox["x", "2"], "+", 
          SuperscriptBox["y", "2"]}], ")"}]}], 
-      SuperscriptBox["wk", "2"]]}], "]"}]}]}]], "Output",
+      SuperscriptBox["wk", "2"]]}], "]"}]}], "wk"]], "Output",
  CellChangeTimes->{{3.697209286049428*^9, 3.69720929195331*^9}, 
    3.697209362561441*^9, 3.697370733351389*^9, 3.697370780911652*^9, 
    3.6973756857542667`*^9, 3.6973786450534487`*^9, 3.697378731347143*^9, 
@@ -952,7 +951,8 @@ Cell[BoxData[
    3.699184491247324*^9, 3.699186458104271*^9, {3.699191924840502*^9, 
    3.699191952764724*^9}, 3.699192138857345*^9, {3.7002279798032217`*^9, 
    3.700228005049419*^9}, {3.700228037608308*^9, 3.700228066010974*^9}, 
-   3.700392805486661*^9, 3.700393088766824*^9, 3.700393132923028*^9}]
+   3.700392805486661*^9, 3.700393088766824*^9, 3.700393132923028*^9, 
+   3.700394657435666*^9}]
 }, Open  ]]
 }, Closed]],
 
@@ -1159,7 +1159,7 @@ Cell[BoxData["0.3371760037478896`"], "Output",
    3.699186458137767*^9, {3.699191924883165*^9, 3.6991919528065853`*^9}, 
    3.69919213900357*^9, {3.700227980330817*^9, 3.700228005450951*^9}, {
    3.7002280378338223`*^9, 3.700228066156958*^9}, 3.700392805831254*^9, 
-   3.700393089708137*^9, 3.7003931340758944`*^9}],
+   3.700393089708137*^9, 3.7003931340758944`*^9, 3.700394658563344*^9}],
 
 Cell[BoxData[
  RowBox[{"-", "0.06603265829010108`"}]], "Output",
@@ -1179,7 +1179,7 @@ Cell[BoxData[
    3.699186458137767*^9, {3.699191924883165*^9, 3.6991919528065853`*^9}, 
    3.69919213900357*^9, {3.700227980330817*^9, 3.700228005450951*^9}, {
    3.7002280378338223`*^9, 3.700228066156958*^9}, 3.700392805831254*^9, 
-   3.700393089708137*^9, 3.7003931340843287`*^9}],
+   3.700393089708137*^9, 3.7003931340758944`*^9, 3.7003946585874853`*^9}],
 
 Cell[BoxData["1.3371760037478895`"], "Output",
  CellChangeTimes->{{3.6967710078313093`*^9, 3.69677110120277*^9}, 
@@ -1198,7 +1198,7 @@ Cell[BoxData["1.3371760037478895`"], "Output",
    3.699186458137767*^9, {3.699191924883165*^9, 3.6991919528065853`*^9}, 
    3.69919213900357*^9, {3.700227980330817*^9, 3.700228005450951*^9}, {
    3.7002280378338223`*^9, 3.700228066156958*^9}, 3.700392805831254*^9, 
-   3.700393089708137*^9, 3.700393134113125*^9}],
+   3.700393089708137*^9, 3.7003931340758944`*^9, 3.700394658588436*^9}],
 
 Cell[BoxData["1.4172493804399073`"], "Output",
  CellChangeTimes->{{3.6967710078313093`*^9, 3.69677110120277*^9}, 
@@ -1217,9 +1217,9 @@ Cell[BoxData["1.4172493804399073`"], "Output",
    3.699186458137767*^9, {3.699191924883165*^9, 3.6991919528065853`*^9}, 
    3.69919213900357*^9, {3.700227980330817*^9, 3.700228005450951*^9}, {
    3.7002280378338223`*^9, 3.700228066156958*^9}, 3.700392805831254*^9, 
-   3.700393089708137*^9, 3.7003931341145763`*^9}]
+   3.700393089708137*^9, 3.7003931340758944`*^9, 3.700394658589271*^9}]
 }, Open  ]]
-}, Closed]],
+}, Open  ]],
 
 Cell[CellGroupData[{
 
@@ -1268,16 +1268,20 @@ Cell[BoxData[{
   RowBox[{
    RowBox[{"dimset", " ", "=", " ", "11"}], ";", 
    RowBox[{"kmax", " ", "=", " ", "0.25"}], ";", " ", 
-   RowBox[{"xmax", " ", "=", "400000"}], ";", " ", 
-   RowBox[{"(*", " ", 
-    RowBox[{"w0", " ", "=", " ", 
-     RowBox[{"20000", "/", "k0"}]}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"xmax", " ", "=", "400000"}], ";"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{"w0", " ", "=", " ", 
+    RowBox[{"20000", "/", "k0"}]}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
    RowBox[{"dimset", " ", "=", " ", "201"}], ";", 
    RowBox[{"kmax", " ", "=", " ", "0.25"}], ";", " ", 
-   RowBox[{"xmax", " ", "=", "400"}], ";", " ", 
-   RowBox[{"(*", " ", 
-    RowBox[{"w0", " ", "=", " ", 
-     RowBox[{"20", "/", "k0"}]}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"xmax", " ", "=", "400"}], ";"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{"w0", " ", "=", " ", 
+    RowBox[{"20", "/", "k0"}]}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
    RowBox[{"small", " ", "=", " ", 
     RowBox[{"\[Pi]", "*", 
      SuperscriptBox["10", 
@@ -1325,12 +1329,14 @@ Cell[BoxData[{
        RowBox[{
         RowBox[{"\[Kappa]perp", "[", "i", "]"}], ",", 
         RowBox[{"\[Kappa]perp", "[", "j", "]"}], ",", 
-        SqrtBox[
-         RowBox[{"1", "-", 
-          SuperscriptBox[
-           RowBox[{"\[Kappa]perp", "[", "i", "]"}], "2"], "-", 
-          SuperscriptBox[
-           RowBox[{"\[Kappa]perp", "[", "j", "]"}], "2"]}]]}], "}"}], ",", 
+        RowBox[{"\[Sqrt]", 
+         RowBox[{"(", 
+          RowBox[{"1", "-", 
+           SuperscriptBox[
+            RowBox[{"\[Kappa]perp", "[", "i", "]"}], "2"], "-", 
+           SuperscriptBox[
+            RowBox[{"\[Kappa]perp", "[", "j", "]"}], "2"]}], ")"}]}]}], "}"}],
+       ",", 
       RowBox[{"{", 
        RowBox[{"j", ",", "1", ",", "dimset"}], "}"}], ",", 
       RowBox[{"{", 
@@ -1442,11 +1448,13 @@ Cell[BoxData[{
      RowBox[{"{", 
       RowBox[{"j", ",", "1", ",", "dimset"}], "}"}], ",", 
      RowBox[{"{", 
-      RowBox[{"i", ",", "1", ",", "dimset"}], "}"}]}], "]"}], ";", " ", 
-   RowBox[{"(*", " ", 
-    RowBox[{
-    "Throws", " ", "out", " ", "evanescent", " ", "incident", " ", "kvecs"}], 
-    " ", "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"i", ",", "1", ",", "dimset"}], "}"}]}], "]"}], ";"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Throws", " ", "out", " ", "evanescent", " ", "incident", " ", "kvecs"}], 
+   " ", "*)"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
    RowBox[{"f", " ", "=", " ", 
     RowBox[{"{", 
      RowBox[{"1", ",", "0", ",", "0"}], "}"}]}], ";"}], 
@@ -1618,39 +1626,47 @@ Cell[BoxData[{
   RowBox[{"IFshift$Rx", " ", "=", 
    RowBox[{"Chop", "[", 
     RowBox[{
-     FractionBox[
-      RowBox[{" ", 
-       RowBox[{"\[CapitalDelta]x", 
-        RowBox[{"(", 
-         RowBox[{"NX$R", "-", 
-          RowBox[{
-           RowBox[{"(", 
-            RowBox[{"dimset", "+", "1"}], ")"}], "/", "2"}]}], ")"}]}]}], 
-      RowBox[{"2", 
-       RowBox[{"\[Pi]", "/", 
-        RowBox[{"(", 
-         RowBox[{"632.8", "*", 
-          SuperscriptBox["10", 
-           RowBox[{"-", "9"}]]}], ")"}]}]}]], "*", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{" ", 
+         RowBox[{"\[CapitalDelta]x", 
+          RowBox[{"(", 
+           RowBox[{"NX$R", "-", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{"dimset", "+", "1"}], ")"}], "/", "2"}]}], ")"}]}]}], 
+        ")"}], "/", 
+       RowBox[{"(", 
+        RowBox[{"2", 
+         RowBox[{"\[Pi]", "/", 
+          RowBox[{"(", 
+           RowBox[{"632.8", "*", 
+            SuperscriptBox["10", 
+             RowBox[{"-", "9"}]]}], ")"}]}]}], ")"}]}], ")"}], "*", 
      SuperscriptBox["10", "6"]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"IFshift$Ry", " ", "=", 
    RowBox[{"Chop", "[", 
     RowBox[{
-     FractionBox[
-      RowBox[{" ", 
-       RowBox[{"\[CapitalDelta]x", 
-        RowBox[{"(", 
-         RowBox[{"NY$R", "-", 
-          RowBox[{
-           RowBox[{"(", 
-            RowBox[{"dimset", "+", "1"}], ")"}], "/", "2"}]}], ")"}]}]}], 
-      RowBox[{"2", 
-       RowBox[{"\[Pi]", "/", 
-        RowBox[{"(", 
-         RowBox[{"632.8", "*", 
-          SuperscriptBox["10", 
-           RowBox[{"-", "9"}]]}], ")"}]}]}]], "*", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{" ", 
+         RowBox[{"\[CapitalDelta]x", 
+          RowBox[{"(", 
+           RowBox[{"NY$R", "-", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{"dimset", "+", "1"}], ")"}], "/", "2"}]}], ")"}]}]}], 
+        ")"}], "/", 
+       RowBox[{"(", 
+        RowBox[{"2", 
+         RowBox[{"\[Pi]", "/", 
+          RowBox[{"(", 
+           RowBox[{"632.8", "*", 
+            SuperscriptBox["10", 
+             RowBox[{"-", "9"}]]}], ")"}]}]}], ")"}]}], ")"}], "*", 
      SuperscriptBox["10", "6"]}], "]"}]}], ";"}]}], "Input",
  CellChangeTimes->{{3.6806115978838053`*^9, 3.680611598379302*^9}, {
    3.6806140301551723`*^9, 3.680614032497303*^9}, {3.68062557061624*^9, 
@@ -1729,12 +1745,12 @@ Cell[BoxData[{
 Cell[BoxData[
  RowBox[{"100.4626036308378`", "\[VeryThinSpace]", "+", 
   RowBox[{"0.`", " ", "\[ImaginaryI]"}]}]], "Output",
- CellChangeTimes->{3.700393491963189*^9}],
+ CellChangeTimes->{3.7003947095949574`*^9}],
 
 Cell[BoxData[
  RowBox[{"100.99999999992129`", "\[VeryThinSpace]", "+", 
   RowBox[{"0.`", " ", "\[ImaginaryI]"}]}]], "Output",
- CellChangeTimes->{3.700393492208261*^9}]
+ CellChangeTimes->{3.7003947098061447`*^9}]
 }, Open  ]]
 }, Open  ]],
 
@@ -1771,35 +1787,24 @@ Cell[BoxData[{
    3.699192155386016*^9}],
 
 Cell[BoxData[
- TemplateBox[{
-  "$RecursionLimit","reclim2",
-   "\"Recursion depth of \\!\\(\\*RowBox[{\\\"1024\\\"}]\\) exceeded during \
-evaluation of \\!\\(\\*RowBox[{RowBox[{\\\"-\\\", \\\"101\\\"}], \\\"+\\\", \
-\\\"NX$R\\\"}]\\).\"",2,29,3,22173640411028784945,"Local"},
-  "MessageTemplate"]], "Message", "MSG",
- CellChangeTimes->{3.700393185850453*^9}],
+ RowBox[{"100.4626036308378`", "\[VeryThinSpace]", "+", 
+  RowBox[{"0.`", " ", "\[ImaginaryI]"}]}]], "Output",
+ CellChangeTimes->{{3.699191140125025*^9, 3.6991911550375977`*^9}, {
+   3.699191608795423*^9, 3.69919161632756*^9}, 3.699191741874633*^9, 
+   3.69919180575804*^9, {3.6991919252882*^9, 3.69919195292523*^9}, 
+   3.6991921393026876`*^9, 3.700228006072721*^9, {3.700228038154868*^9, 
+   3.700228066545129*^9}, 3.700392812555936*^9, 3.7003931858605013`*^9, 
+   3.700394710023044*^9}],
 
 Cell[BoxData[
- RowBox[{"Hold", "[", 
-  RowBox[{
-   RowBox[{"(", 
-    RowBox[{"40.68815218734305`", "\[VeryThinSpace]", "+", 
-     RowBox[{"0.`", " ", "\[ImaginaryI]"}]}], ")"}], " ", 
-   RowBox[{"(", 
-    RowBox[{
-     RowBox[{"-", "101"}], "+", "NX$R"}], ")"}]}], "]"}]], "Output",
+ RowBox[{"100.99999999992129`", "\[VeryThinSpace]", "+", 
+  RowBox[{"0.`", " ", "\[ImaginaryI]"}]}]], "Output",
  CellChangeTimes->{{3.699191140125025*^9, 3.6991911550375977`*^9}, {
    3.699191608795423*^9, 3.69919161632756*^9}, 3.699191741874633*^9, 
    3.69919180575804*^9, {3.6991919252882*^9, 3.69919195292523*^9}, 
    3.6991921393026876`*^9, 3.700228006072721*^9, {3.700228038154868*^9, 
-   3.700228066545129*^9}, 3.700392812555936*^9, 3.7003931858605013`*^9}],
-
-Cell[BoxData["NY$R"], "Output",
- CellChangeTimes->{{3.699191140125025*^9, 3.6991911550375977`*^9}, {
-   3.699191608795423*^9, 3.69919161632756*^9}, 3.699191741874633*^9, 
-   3.69919180575804*^9, {3.6991919252882*^9, 3.69919195292523*^9}, 
-   3.6991921393026876`*^9, 3.700228006072721*^9, {3.700228038154868*^9, 
-   3.700228066545129*^9}, 3.700392812555936*^9, 3.700393185862273*^9}]
+   3.700228066545129*^9}, 3.700392812555936*^9, 3.7003931858605013`*^9, 
+   3.70039471003264*^9}]
 }, Open  ]]
 }, Closed]],
 
@@ -1852,7 +1857,8 @@ Cell[BoxData[
  CellChangeTimes->{
   3.6991908983795033`*^9, {3.6991919253726273`*^9, 3.699191952958412*^9}, 
    3.699192139334716*^9, 3.7002280061059637`*^9, {3.7002280382329617`*^9, 
-   3.700228066628434*^9}, 3.700392812591105*^9, 3.70039318600434*^9}]
+   3.700228066628434*^9}, 3.700392812591105*^9, 3.70039318600434*^9, 
+   3.700394710337619*^9}]
 }, Open  ]],
 
 Cell[BoxData[{
@@ -1999,8 +2005,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 38, 
-             22173640411028784945, 5/2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 61, 
+             22173650399752428589, 5/2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2031,8 +2037,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 38, 
-             22173640411028784945, 5 2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 61, 
+             22173650399752428589, 5 2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2063,8 +2069,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 38, 
-             22173640411028784945, Infinity],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 61, 
+             22173650399752428589, Infinity],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2131,13 +2137,13 @@ Cell[BoxData[
     StripOnInput->False],
    Deploy,
    DefaultBaseStyle->"Deploy"],
-  Out[38]]], "Output",
+  Out[61]]], "Output",
  CellChangeTimes->{
   3.69860611190594*^9, 3.698607329708514*^9, 3.698757510285872*^9, 
    3.698767628798759*^9, 3.699184492142332*^9, {3.6991919254062634`*^9, 
    3.69919195298549*^9}, 3.699192139461232*^9, 3.7002280062552137`*^9, {
    3.7002280383676357`*^9, 3.70022806676729*^9}, 3.700392815880612*^9, 
-   3.700393204510027*^9}]
+   3.700393204510027*^9, 3.700394730249483*^9}]
 }, Open  ]],
 
 Cell[BoxData[{
@@ -2496,8 +2502,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 51, 
-             22173640411028784945, 5/2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 74, 
+             22173650399752428589, 5/2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2528,8 +2534,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 51, 
-             22173640411028784945, 5 2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 74, 
+             22173650399752428589, 5 2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2560,8 +2566,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 51, 
-             22173640411028784945, Infinity],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 74, 
+             22173650399752428589, Infinity],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2628,7 +2634,7 @@ Cell[BoxData[
     StripOnInput->False],
    Deploy,
    DefaultBaseStyle->"Deploy"],
-  Out[51]]], "Output",
+  Out[74]]], "Output",
  CellChangeTimes->{{3.697975643982912*^9, 3.6979756882866898`*^9}, {
    3.6979757794960337`*^9, 3.6979758318346148`*^9}, {3.697975896205926*^9, 
    3.697975903090233*^9}, 3.6979761407868023`*^9, 3.697976198781406*^9, {
@@ -2647,7 +2653,7 @@ Cell[BoxData[
    3.698757510371375*^9, 3.6987676289758863`*^9, 3.699184492223605*^9, {
    3.699191925502358*^9, 3.699191953059393*^9}, 3.69919213964992*^9, 
    3.700228006494492*^9, {3.700228038568137*^9, 3.700228066964012*^9}, 
-   3.700392816392755*^9, 3.70039320773055*^9}],
+   3.700392816392755*^9, 3.70039320773055*^9, 3.700394734195428*^9}],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2725,8 +2731,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 52, 
-             22173640411028784945, 5/2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 75, 
+             22173650399752428589, 5/2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2757,8 +2763,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 52, 
-             22173640411028784945, 5 2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 75, 
+             22173650399752428589, 5 2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2789,8 +2795,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 52, 
-             22173640411028784945, Infinity],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 75, 
+             22173650399752428589, Infinity],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2857,7 +2863,7 @@ Cell[BoxData[
     StripOnInput->False],
    Deploy,
    DefaultBaseStyle->"Deploy"],
-  Out[52]]], "Output",
+  Out[75]]], "Output",
  CellChangeTimes->{{3.697975643982912*^9, 3.6979756882866898`*^9}, {
    3.6979757794960337`*^9, 3.6979758318346148`*^9}, {3.697975896205926*^9, 
    3.697975903090233*^9}, 3.6979761407868023`*^9, 3.697976198781406*^9, {
@@ -2876,7 +2882,7 @@ Cell[BoxData[
    3.698757510371375*^9, 3.6987676289758863`*^9, 3.699184492223605*^9, {
    3.699191925502358*^9, 3.699191953059393*^9}, 3.69919213964992*^9, 
    3.700228006494492*^9, {3.700228038568137*^9, 3.700228066964012*^9}, 
-   3.700392816392755*^9, 3.700393210146983*^9}],
+   3.700392816392755*^9, 3.70039320773055*^9, 3.7003947373917627`*^9}],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2954,8 +2960,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 53, 
-             22173640411028784945, 5/2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 76, 
+             22173650399752428589, 5/2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -2986,8 +2992,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 53, 
-             22173640411028784945, 5 2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 76, 
+             22173650399752428589, 5 2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3018,8 +3024,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 53, 
-             22173640411028784945, Infinity],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 76, 
+             22173650399752428589, Infinity],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3086,7 +3092,7 @@ Cell[BoxData[
     StripOnInput->False],
    Deploy,
    DefaultBaseStyle->"Deploy"],
-  Out[53]]], "Output",
+  Out[76]]], "Output",
  CellChangeTimes->{{3.697975643982912*^9, 3.6979756882866898`*^9}, {
    3.6979757794960337`*^9, 3.6979758318346148`*^9}, {3.697975896205926*^9, 
    3.697975903090233*^9}, 3.6979761407868023`*^9, 3.697976198781406*^9, {
@@ -3105,7 +3111,7 @@ Cell[BoxData[
    3.698757510371375*^9, 3.6987676289758863`*^9, 3.699184492223605*^9, {
    3.699191925502358*^9, 3.699191953059393*^9}, 3.69919213964992*^9, 
    3.700228006494492*^9, {3.700228038568137*^9, 3.700228066964012*^9}, 
-   3.700392816392755*^9, 3.70039321265512*^9}],
+   3.700392816392755*^9, 3.70039320773055*^9, 3.7003947405869093`*^9}],
 
 Cell[BoxData[
  InterpretationBox[
@@ -3183,8 +3189,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 54, 
-             22173640411028784945, 5/2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 77, 
+             22173650399752428589, 5/2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3215,8 +3221,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 54, 
-             22173640411028784945, 5 2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 77, 
+             22173650399752428589, 5 2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3247,8 +3253,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 54, 
-             22173640411028784945, Infinity],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 77, 
+             22173650399752428589, Infinity],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3315,7 +3321,7 @@ Cell[BoxData[
     StripOnInput->False],
    Deploy,
    DefaultBaseStyle->"Deploy"],
-  Out[54]]], "Output",
+  Out[77]]], "Output",
  CellChangeTimes->{{3.697975643982912*^9, 3.6979756882866898`*^9}, {
    3.6979757794960337`*^9, 3.6979758318346148`*^9}, {3.697975896205926*^9, 
    3.697975903090233*^9}, 3.6979761407868023`*^9, 3.697976198781406*^9, {
@@ -3334,7 +3340,7 @@ Cell[BoxData[
    3.698757510371375*^9, 3.6987676289758863`*^9, 3.699184492223605*^9, {
    3.699191925502358*^9, 3.699191953059393*^9}, 3.69919213964992*^9, 
    3.700228006494492*^9, {3.700228038568137*^9, 3.700228066964012*^9}, 
-   3.700392816392755*^9, 3.70039321324757*^9}],
+   3.700392816392755*^9, 3.70039320773055*^9, 3.700394741231036*^9}],
 
 Cell[BoxData[
  InterpretationBox[
@@ -3412,8 +3418,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 55, 
-             22173640411028784945, 5/2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 78, 
+             22173650399752428589, 5/2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3444,8 +3450,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 55, 
-             22173640411028784945, 5 2],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 78, 
+             22173650399752428589, 5 2],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3476,8 +3482,8 @@ Cell[BoxData[
            ButtonFunction:>OutputSizeLimit`ButtonFunction[
              Composition[OutputSizeLimit`Defer, 
               Function[{OutputSizeLimit`Dump`x$}, 
-               MatrixForm[OutputSizeLimit`Dump`x$]]], 55, 
-             22173640411028784945, Infinity],
+               MatrixForm[OutputSizeLimit`Dump`x$]]], 78, 
+             22173650399752428589, Infinity],
            Enabled->True,
            Evaluator->Automatic,
            Method->"Queued"], 
@@ -3544,7 +3550,7 @@ Cell[BoxData[
     StripOnInput->False],
    Deploy,
    DefaultBaseStyle->"Deploy"],
-  Out[55]]], "Output",
+  Out[78]]], "Output",
  CellChangeTimes->{{3.697975643982912*^9, 3.6979756882866898`*^9}, {
    3.6979757794960337`*^9, 3.6979758318346148`*^9}, {3.697975896205926*^9, 
    3.697975903090233*^9}, 3.6979761407868023`*^9, 3.697976198781406*^9, {
@@ -3563,7 +3569,7 @@ Cell[BoxData[
    3.698757510371375*^9, 3.6987676289758863`*^9, 3.699184492223605*^9, {
    3.699191925502358*^9, 3.699191953059393*^9}, 3.69919213964992*^9, 
    3.700228006494492*^9, {3.700228038568137*^9, 3.700228066964012*^9}, 
-   3.700392816392755*^9, 3.7003932156577673`*^9}]
+   3.700392816392755*^9, 3.70039320773055*^9, 3.7003947440252733`*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -3581,15 +3587,15 @@ Cell[BoxData["0.3989422804014327`"], "Output",
    3.698767629049658*^9, 3.699184492250749*^9, {3.699191925598949*^9, 
    3.699191953090033*^9}, 3.699192139705224*^9, 3.700228006660328*^9, {
    3.7002280386763153`*^9, 3.700228067077808*^9}, 3.700392817337322*^9, 
-   3.7003932157086973`*^9}]
+   3.7003932157086973`*^9, 3.7003947441622868`*^9}]
 }, Open  ]]
 }, Closed]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 },
-WindowSize->{640, 781},
-WindowMargins->{{640, 0}, {Automatic, 0}},
+WindowSize->{1280, 781},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
 Magnification->0.75,
 FrontEndVersion->"11.0 for Linux x86 (64-bit) (July 28, 2016)",
 StyleDefinitions->"Lusk_classroom.nb"
@@ -3612,78 +3618,77 @@ Cell[CellGroupData[{
 Cell[39586, 671, 538, 7, 49, "Section"],
 Cell[CellGroupData[{
 Cell[40149, 682, 308, 4, 33, "Subsection"],
-Cell[40460, 688, 7112, 182, 502, "Input"],
+Cell[40460, 688, 7112, 182, 376, "Input"],
 Cell[CellGroupData[{
-Cell[47597, 874, 932, 22, 27, "Input"],
-Cell[48532, 898, 2362, 56, 70, "Output"]
+Cell[47597, 874, 932, 22, 20, "Input"],
+Cell[48532, 898, 2370, 56, 70, "Output"]
 }, Open  ]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[50943, 960, 205, 2, 29, "Subsection"],
-Cell[51151, 964, 1158, 29, 8, "Input"]
+Cell[50951, 960, 205, 2, 29, "Subsection"],
+Cell[51159, 964, 1158, 29, 6, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[52346, 998, 158, 2, 28, "Subsection"],
+Cell[52354, 998, 158, 2, 28, "Subsection"],
 Cell[CellGroupData[{
-Cell[52529, 1004, 4742, 138, 70, "Input"],
-Cell[57274, 1144, 1240, 17, 70, "Output"],
-Cell[58517, 1163, 1258, 18, 70, "Output"],
-Cell[59778, 1183, 1238, 17, 70, "Output"],
-Cell[61019, 1202, 1240, 17, 70, "Output"]
-}, Open  ]]
-}, Closed]],
-Cell[CellGroupData[{
-Cell[62308, 1225, 1144, 17, 29, "Subsection"],
-Cell[CellGroupData[{
-Cell[63477, 1246, 205, 3, 28, "Subsubsection"],
-Cell[CellGroupData[{
-Cell[63707, 1253, 18927, 473, 1354, "Input"],
-Cell[82637, 1728, 166, 3, 23, "Output"],
-Cell[82806, 1733, 167, 3, 23, "Output"]
+Cell[52537, 1004, 4742, 138, 468, "Input"],
+Cell[57282, 1144, 1262, 17, 23, "Output"],
+Cell[58547, 1163, 1282, 18, 23, "Output"],
+Cell[59832, 1183, 1262, 17, 23, "Output"],
+Cell[61097, 1202, 1262, 17, 23, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[83022, 1742, 361, 5, 27, "Subsubsection"],
+Cell[62408, 1225, 1144, 17, 34, "Subsection"],
 Cell[CellGroupData[{
-Cell[83408, 1751, 727, 19, 18, "Input"],
-Cell[84138, 1772, 358, 7, 70, "Message"],
-Cell[84499, 1781, 635, 13, 70, "Output"],
-Cell[85137, 1796, 382, 5, 70, "Output"]
+Cell[63577, 1246, 205, 3, 28, "Subsubsection"],
+Cell[CellGroupData[{
+Cell[63807, 1253, 19286, 489, 887, "Input"],
+Cell[83096, 1744, 168, 3, 23, "Output"],
+Cell[83267, 1749, 169, 3, 23, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[83485, 1758, 361, 5, 27, "Subsubsection"],
+Cell[CellGroupData[{
+Cell[83871, 1767, 727, 19, 13, "Input"],
+Cell[84601, 1788, 503, 8, 70, "Output"],
+Cell[85107, 1798, 503, 8, 70, "Output"]
 }, Open  ]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[85568, 1807, 250, 3, 23, "Subsubsection"],
+Cell[85659, 1812, 250, 3, 23, "Subsubsection"],
 Cell[CellGroupData[{
-Cell[85843, 1814, 1258, 32, 24, "Input"],
-Cell[87104, 1848, 350, 6, 70, "Output"]
+Cell[85934, 1819, 1258, 32, 18, "Input"],
+Cell[87195, 1853, 376, 7, 70, "Output"]
 }, Open  ]],
-Cell[87469, 1857, 787, 15, 18, "Input"]
+Cell[87586, 1863, 787, 15, 13, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[88293, 1877, 273, 3, 24, "Subsubsection"],
+Cell[88410, 1883, 273, 3, 24, "Subsubsection"],
 Cell[CellGroupData[{
-Cell[88591, 1884, 2034, 39, 6, "Input"],
-Cell[90628, 1925, 8476, 214, 70, "Output"]
+Cell[88708, 1890, 2034, 39, 4, "Input"],
+Cell[90745, 1931, 8498, 214, 70, "Output"]
 }, Open  ]],
-Cell[99119, 2142, 3527, 87, 17, "Input"]
+Cell[99258, 2148, 3527, 87, 12, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[102683, 2234, 155, 2, 24, "Subsubsection"],
-Cell[102841, 2238, 4069, 100, 6, "Input"]
+Cell[102822, 2240, 155, 2, 24, "Subsubsection"],
+Cell[102980, 2244, 4069, 100, 4, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[106947, 2343, 161, 2, 24, "Subsubsection"],
+Cell[107086, 2349, 161, 2, 24, "Subsubsection"],
 Cell[CellGroupData[{
-Cell[107133, 2349, 2816, 71, 9, "Input"],
-Cell[109952, 2422, 9485, 227, 70, "Output"],
-Cell[119440, 2651, 9486, 227, 70, "Output"],
-Cell[128929, 2880, 9485, 227, 70, "Output"],
-Cell[138417, 3109, 9485, 227, 70, "Output"],
-Cell[147905, 3338, 9488, 227, 70, "Output"]
+Cell[107272, 2355, 2816, 71, 6, "Input"],
+Cell[110091, 2428, 9507, 227, 70, "Output"],
+Cell[119601, 2657, 9509, 227, 70, "Output"],
+Cell[129113, 2886, 9509, 227, 70, "Output"],
+Cell[138625, 3115, 9507, 227, 70, "Output"],
+Cell[148135, 3344, 9509, 227, 70, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[157430, 3570, 178, 5, 2, "Input"],
-Cell[157611, 3577, 432, 6, 70, "Output"]
+Cell[157681, 3576, 178, 5, 1, "Input"],
+Cell[157862, 3583, 456, 6, 70, "Output"]
 }, Open  ]]
 }, Closed]]
 }, Open  ]]
