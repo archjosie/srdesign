@@ -181,8 +181,8 @@ int main(int argc, char** argv){
 			kVec.push_back(ky);
 
 			double kz = sqrt(1 - pow(kx, 2) - pow(ky, 2));
-			//if (isnan(kz)) kVec.push_back(0);
-			/*else*/ kVec.push_back(kz);
+			if (isnan(kz)) kVec.push_back(0);
+			else kVec.push_back(kz);
 			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
 			/*cout << "<" << kVec.at(0) << "," << kVec.at(1) << "," << kVec.at(2) << ">" << endl;
 			char dum;
@@ -200,6 +200,7 @@ int main(int argc, char** argv){
     //mathematica notebook) to generate ERtab
 
 	vector<vector<vector<complex<double> > > > ERTab(dimset, vector<vector<complex<double> > >(dimset, vector<complex<double> >(3, complex<double>(0, 0))));
+    int nanc = 0;
 
     for (int i = 0; i < dimset; i++) {
     	for (int j = 0; j < dimset; j++) {
@@ -209,12 +210,11 @@ int main(int argc, char** argv){
     		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
     		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
 
-			if (isnan(ERTab.at(i).at(j).at(0).real()) || isnan(ERTab.at(i).at(j).at(1).real()) || isnan(ERTab.at(i).at(j).at(2).real()) || isnan(ERTab.at(i).at(j).at(0).imag()) || isnan(ERTab.at(i).at(j).at(1).imag()) || isnan(ERTab.at(i).at(j).at(2).imag())) 
-				for (int k = 0; k < 3; k++) ERTab.at(i).at(j).at(k) = (0, 0);
-
-			if (pow(generateK(i, dimset, beam1.getK(), xKappa), 2) + pow(generateK(j, dimset, beam1.getK(), yKappa), 2) >= 1.0) {			
-				for (int k = 0; k < 3; k++) ERTab.at(i).at(j).at(k) = (0, 0);				
-			}
+			if (isnan(ERTab.at(i).at(j).at(0).real()) || isnan(ERTab.at(i).at(j).at(1).real()) || isnan(ERTab.at(i).at(j).at(2).real()) || isnan(ERTab.at(i).at(j).at(0).imag()) || isnan(ERTab.at(i).at(j).at(1).imag()) || isnan(ERTab.at(i).at(j).at(2).imag()))
+            cout << ++nanc << " NAN found: " << i << ", " << j << endl;
+                
+            //cout << ++nanc << " NAN found: " << i << ", " << j << endl;
+            
 			/*cout << "<(" << chop(real(ERTab.at(i).at(j).at(0))) << "," << chop(imag(ERTab.at(i).at(j).at(0))) << "), (" << chop(real(ERTab.at(i).at(j).at(1))) << "," << chop(imag(ERTab.at(i).at(j).at(1))) << "), (" << chop(real(ERTab.at(i).at(j).at(2))) << "," << chop(imag(ERTab.at(i).at(j).at(2))) << ")>" << endl;
 			char dum;
 			cin >> dum;
