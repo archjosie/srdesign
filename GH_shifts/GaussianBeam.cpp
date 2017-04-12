@@ -35,7 +35,7 @@ GaussianBeam::GaussianBeam(double w0, double lambda, unsigned int p, unsigned in
 double GaussianBeam::distance(double x, double y) {
 	return sqrt(pow(x, 2) + pow(y, 2));
 }
-
+/*
 double GaussianBeam::calculateRadCurv(double z) {
 	return (z*(1 + pow(zR / z, 2)));
 }
@@ -47,7 +47,7 @@ double GaussianBeam::calculateGouy(double z) {
 double GaussianBeam::calculateWaist(double z) {
 	return w0*sqrt(1 + pow(z / zR, 2));
 }
-
+*/
 double GaussianBeam::calculateRayleigh() {
 	return 3.14159265 * pow(w0, 2) / lambda;
 }
@@ -126,7 +126,7 @@ void GaussianBeam::calculateGaussData() {
 	}
 	}*/
 
-	double omega = 20 / k;
+	double omega = 20000 / k;
 
 	for (int i = 0; i < xVals.size(); ++i) {
 		for (int j = 0; j < yVals.size(); ++j) {
@@ -218,11 +218,11 @@ double GaussianBeam::getK()
 	return k;
 }
 
-double GaussianBeam::laguerre(double k, double alpha, double x) {
+double GaussianBeam::laguerre(double k, double alpha, double x) { //Fixed recurrence relation, maybe probably not
 	if (k == 0) return 1;
 	if (k == 1) return 1 + alpha - x;
 
-	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1);
+	return ((2 * k + 1 + alpha - x)*laguerre(k-1, alpha, x) - (k + alpha)*laguerre(k-2, alpha, x)) / (k + 1);
 }
 
 int GaussianBeam::getDims() {
