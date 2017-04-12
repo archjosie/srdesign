@@ -68,7 +68,7 @@ double shift(double THETA){
 	time_t start = clock();
     //cout << "Starting Calculations" << endl;
     double k0 = 1;
-    GaussianBeam beam1(20/k0,2*PI,0,0);
+    GaussianBeam beam1(20000/k0,2*PI,0,0);
     beam1.calculateGaussData();
 	int dimset = beam1.getDims();
 
@@ -92,8 +92,8 @@ double shift(double THETA){
 	int k = 0;
 	for (int i = 0; i < dimset; i++) {
 		for (int j = 0; j < dimset; j++) {
-			in[k][0] = beam1.realEAt(i, j, 0)*exp(-100);
-			in[k][1] = beam1.imagEAt(i, j, 0)*exp(-100);
+			in[k][0] = beam1.realEAt(i, j, 0);
+			in[k][1] = beam1.imagEAt(i, j, 0);
 			k++;
 		}
 	}
