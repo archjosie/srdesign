@@ -159,8 +159,12 @@ double shift(double THETA){
     		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
     		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
 
-			if (isnan(ERTab.at(i).at(j).at(0).real()) || isnan(ERTab.at(i).at(j).at(1).real()) || isnan(ERTab.at(i).at(j).at(2).real()) || isnan(ERTab.at(i).at(j).at(0).imag()) || isnan(ERTab.at(i).at(j).at(1).imag()) || isnan(ERTab.at(i).at(j).at(2).imag()))
+			if (isnan(ERTab.at(i).at(j).at(0).real()) || isnan(ERTab.at(i).at(j).at(1).real()) || isnan(ERTab.at(i).at(j).at(2).real()) || isnan(ERTab.at(i).at(j).at(0).imag()) || isnan(ERTab.at(i).at(j).at(1).imag()) || isnan(ERTab.at(i).at(j).at(2).imag())){
             cout << ++nanc << " NAN found: " << i << ", " << j << endl;
+    		ERTab.at(i).at(j).at(0) = 0;
+    		ERTab.at(i).at(j).at(1) = 0;
+    		ERTab.at(i).at(j).at(2) = 0;
+            }
                 
 			}
     }
@@ -255,8 +259,8 @@ double shift(double THETA){
     //cout << "Calculated" << endl;
     //cout << "(" << nXr-(dimset+1)/2 << "," << nYr-(dimset+1)/2 << ")" << endl;
 
-//    cout << "Analytical" << endl;
-//    cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
+    //cout << "Analytical" << endl;
+    //cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
 
 	//cout << "Total time elapsed: " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
@@ -266,17 +270,26 @@ double shift(double THETA){
 
 int main(int argc, char** argv){
     GaussianBeam beam1(20,2*PI,0,0);
-    int reso = 3;
+    int reso = 35;
+    ofstream fout;
     vector<vector<double> > xShifts(reso, vector<double>(2,0));
+    fout.open("GH_shifts.tsv");
+    if(fout.fail()){ 
+        cerr << "fout failed";
+        exit(-1);
+    }
 
     for (int i = 0; i < reso; i++) {
-        double theta = 10+(70/(i+1));
+        double theta = 10+(70/(reso)*i);
         xShifts.at(i).at(0) = theta;
         xShifts.at(i).at(1) = shift(theta);
-        cout << shift(theta) << endl;
+        fout << theta << "\t" << shift(theta) << endl;
+        cout << i << endl;
 	}
 
-    beam1.rootGraph_2d(argc, argv, reso,  xShifts);
+    fout.close();
+
+    //beam1.rootGraph_2d(argc, argv, reso,  xShifts);
 
     return 0;
 }
