@@ -218,11 +218,11 @@ double GaussianBeam::getK()
 	return k;
 }
 
-double GaussianBeam::laguerre(double k, double alpha, double x) {
+double GaussianBeam::laguerre(double k, double alpha, double x) { //Fixed recurrence relation
 	if (k == 0) return 1;
 	if (k == 1) return 1 + alpha - x;
 
-	return ((2 * k + 1 + alpha - x)*laguerre(x, alpha, k) - (k + alpha)*laguerre(x, alpha, k - 1)) / (k + 1);
+	return ((2 * k + 1 + alpha - x)*laguerre(k, alpha, x) - (k + alpha)*laguerre(k-1, alpha, x)) / (k + 1);
 }
 
 int GaussianBeam::getDims() {
