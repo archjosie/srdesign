@@ -4,6 +4,7 @@
 
 const static double PI = 3.14159265;
 const static double NVAL = 0.659283;
+const static double WIDTH = 7e-5;
 using namespace std;
 
 complex<double> rTE(double n, double theta, vector<double> kvec){
@@ -14,9 +15,12 @@ complex<double> rTE(double n, double theta, vector<double> kvec){
     nvec.push_back(cos(theta));
 	double theDot = nvec.at(0)*kvec.at(0) + nvec.at(1)*kvec.at(1) + nvec.at(2)*kvec.at(2);
 
-    double beta= acos(theDot);
-	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
-	complex<double> ans = (cos(beta) - sqrt(arg)) / (cos(beta) + sqrt(arg));
+    double beta = acos(theDot);
+	complex<double> c(pow(n, 2) - pow(sin(beta), 2), 0);
+	complex<double> phi(2 * WIDTH * c);
+	phi = exp(complex<double>(0,1)*phi);
+	//Y'all ready for some complex math?
+	complex<double> ans = -((phi - complex<double>(1,0)) * (-pow(n,2)+pow(n*n*cos(beta),2)+pow(sin(beta),2))) / (complex<double>(-2,0)*c*(phi - complex<double>(1, 0))*cos(beta)*pow(n,2) + (phi - complex<double>(1, 0))*pow(cos(beta),2)*pow(n,4) + (phi - complex<double>(1, 0))*c*c);
 	return ans;
 } 
 
@@ -29,8 +33,13 @@ complex<double> rTM(double n, double theta, vector<double> kvec){
 	double theDot = nvec.at(0)*kvec.at(0) + nvec.at(1)*kvec.at(1) + nvec.at(2)*kvec.at(2);
 
 	double beta = acos(theDot);
-	complex<double> arg(pow(n, 2) - pow(sin(beta), 2), 0);
-	complex<double> ans = (pow(n,2)*cos(beta)-sqrt(arg))/(pow(n,2)*cos(beta)+sqrt(arg));
+	complex<double> c(pow(n, 2) - pow(sin(beta), 2), 0);
+	complex<double> phi(2 * WIDTH * c);
+	phi = exp(complex<double>(0, 1)*phi);
+	complex<double> psi(2 * WIDTH * c * c);
+	psi = exp(complex<double>(0, 1)*psi);
+	//Y'all ready for some complex math?
+	complex<double> ans = -((psi - complex<double>(1, 0)) * (pow(n, 2) - 1)) / (complex<double>(-2, 0)*c*(phi - complex<double>(1, 0))*cos(beta) + (phi - complex<double>(1, 0))*pow(cos(beta), 2) + (phi - complex<double>(1, 0))*c*c);
 	return ans;
 } 
 
