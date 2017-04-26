@@ -3,11 +3,11 @@
 // Looking for shift of -1.08401 @ 44 degrees and n=0.6592
 
 const static double PI = 3.14159265;
-const static double NVAL = 0.659283;
-const static double WIDTH = 7e-5;
+const static double NVAL = 1.5168;
+const static double WIDTH = 13.720088565627512;
 using namespace std;
 
-complex<double> rTE(double n, double theta, vector<double> kvec){
+complex<double> rTM(double n, double theta, vector<double> kvec){
 	theta *= PI / 180;
     vector<double> nvec;
     nvec.push_back(-sin(theta));
@@ -20,11 +20,11 @@ complex<double> rTE(double n, double theta, vector<double> kvec){
 	complex<double> phi(2 * WIDTH * c);
 	phi = exp(complex<double>(0,1)*phi);
 	//Y'all ready for some complex math?
-	complex<double> ans = -((phi - complex<double>(1,0)) * (-pow(n,2)+pow(n*n*cos(beta),2)+pow(sin(beta),2))) / (complex<double>(-2,0)*c*(phi - complex<double>(1, 0))*cos(beta)*pow(n,2) + (phi - complex<double>(1, 0))*pow(cos(beta),2)*pow(n,4) + (phi - complex<double>(1, 0))*c*c);
+	complex<double> ans = -((phi - complex<double>(1,0)) * (-pow(n,2)+pow(n*n*cos(beta),2)+pow(sin(beta),2))) / (complex<double>(-2,0)*c*(phi + complex<double>(1, 0))*cos(beta)*pow(n,2) + (phi - complex<double>(1, 0))*pow(cos(beta),2)*pow(n,4) + (phi - complex<double>(1, 0))*c*c);
 	return ans;
 } 
 
-complex<double> rTM(double n, double theta, vector<double> kvec){
+complex<double> rTE(double n, double theta, vector<double> kvec){
 	theta *= PI / 180;
     vector<double> nvec;
     nvec.push_back(-sin(theta));
@@ -39,7 +39,7 @@ complex<double> rTM(double n, double theta, vector<double> kvec){
 	complex<double> psi(2 * WIDTH * c * c);
 	psi = exp(complex<double>(0, 1)*psi);
 	//Y'all ready for some complex math?
-	complex<double> ans = -((psi - complex<double>(1, 0)) * (pow(n, 2) - 1)) / (complex<double>(-2, 0)*c*(phi - complex<double>(1, 0))*cos(beta) + (phi - complex<double>(1, 0))*pow(cos(beta), 2) + (phi - complex<double>(1, 0))*c*c);
+	complex<double> ans = -((psi - complex<double>(1, 0)) * (pow(n, 2) - 1)) / (complex<double>(-2, 0)*c*(phi + complex<double>(1, 0))*cos(beta) + (phi - complex<double>(1, 0))*pow(cos(beta), 2) + (phi - complex<double>(1, 0))*c*c);
 	return ans;
 } 
 
@@ -77,7 +77,7 @@ double shift(double THETA){
 	time_t start = clock();
     //cout << "Starting Calculations" << endl;
     double k0 = 1;
-    GaussianBeam beam1(20000/k0,2*PI,0,0);
+    GaussianBeam beam1(20000/k0,2*PI,0,5);
     beam1.calculateGaussData();
 	int dimset = beam1.getDims();
 
