@@ -196,32 +196,8 @@ int main(int argc, char** argv){
 	//DO NOT CHANGE ANYTHING ABOVE THIS LINE!! AS FAR AS WE KNOW, IT'S WORKING FINE!
 	cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / CLOCKS_PER_SEC << " seconds." << endl;
 
-	inx = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
-	outx = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
-    
-	iny = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
-	outy = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
-
-	inz = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
-	outz = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size());
-
 	in3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
 	out3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
-
-    k = 0;
-    for (int i = 0; i < ERTab.size(); i++) {
-        for (int j = 0; j < ERTab.at(0).size(); j++){ 
-			inx[k][0] = real(ERTab.at(i).at(j).at(0));
-			inx[k][1] = -imag(ERTab.at(i).at(j).at(0));
-
-			iny[k][0] = real(ERTab.at(i).at(j).at(1));
-			iny[k][1] = -imag(ERTab.at(i).at(j).at(1));
-
-			inz[k][0] = real(ERTab.at(i).at(j).at(2));
-			inz[k][1] = -imag(ERTab.at(i).at(j).at(2));
-			k++;
-        }    
-    }
 
 	k = 0;
 	for (int i = 0; i < ERTab.size(); i++) {
@@ -239,15 +215,6 @@ int main(int argc, char** argv){
 			k++;
 		}
 	}
-
-    fftw_plan hx = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inx, outx, FFTW_BACKWARD, FFTW_ESTIMATE);
-    fftw_execute(hx);
-
-	fftw_plan hy = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), iny, outy, FFTW_BACKWARD, FFTW_ESTIMATE);
-	fftw_execute(hy);
-
-	fftw_plan hz = fftw_plan_dft_2d(ERTab.size(), ERTab.at(0).size(), inz, outz, FFTW_BACKWARD, FFTW_ESTIMATE);
-	fftw_execute(hz);
 
 	fftw_plan h3 = fftw_plan_dft_3d(ERTab.size(), ERTab.at(0).size(), 3, in3, out3, FFTW_BACKWARD, FFTW_ESTIMATE);
 	fftw_execute(h3);
@@ -307,18 +274,9 @@ int main(int argc, char** argv){
 
     fftw_free(in);
     fftw_free(out);
-    fftw_free(inx);
-    fftw_free(outx);
-	fftw_free(iny);
-	fftw_free(outy);
-	fftw_free(inz);
-	fftw_free(outz);
 	fftw_free(in3);
 	fftw_free(out3);
 
-    fftw_destroy_plan(hx);
-	fftw_destroy_plan(hy);
-	fftw_destroy_plan(hz);
 	fftw_destroy_plan(h3);
     fftw_destroy_plan(g);
 

@@ -68,14 +68,14 @@ double shift(double THETA){
 	time_t start = clock();
     //cout << "Starting Calculations" << endl;
     double k0 = 1;
-    GaussianBeam beam1(20/k0,2*PI,0,0);
+    GaussianBeam beam1(20000/k0,2*PI,0,0);
     beam1.calculateGaussData();
 	int dimset = beam1.getDims();
 
     //Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
     vector<complex<double> > fVec(3, complex<double>(0, 0));
     fVec.at(0)=1;
-    fVec.at(1)=0;
+    fVec.at(1)=complex<double>(0,-1);
     fVec.at(2)=0;
 
     //Define the max xKappa and yKappa values
@@ -92,8 +92,8 @@ double shift(double THETA){
 	int k = 0;
 	for (int i = 0; i < dimset; i++) {
 		for (int j = 0; j < dimset; j++) {
-			in[k][0] = beam1.realEAt(i, j, 0)*exp(-100);
-			in[k][1] = beam1.imagEAt(i, j, 0)*exp(-100);
+			in[k][0] = beam1.realEAt(i, j, 0);
+			in[k][1] = beam1.imagEAt(i, j, 0);
 			k++;
 		}
 	}
@@ -250,7 +250,7 @@ double shift(double THETA){
 
 	double nXr = nXrp1 / denom;
 	double nYr = nYrp1 / denom;
-    double xShift = nXr-(dimset+1)/2;
+    double xShift = 2*400000/200*(nXr-(dimset+1)/2)/(2*PI/(632.8*pow(10, -9)))*pow(10,6);
 
     //Compare calculated shifts to analytical result
     complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
@@ -272,18 +272,18 @@ int main(int argc, char** argv){
     GaussianBeam beam1(20,2*PI,0,0);
     int reso = 35;
     ofstream fout;
-    vector<vector<double> > xShifts(reso, vector<double>(2,0));
+    vector<vector<double> > xShifts(reso+1, vector<double>(2,0));
     fout.open("GH_shifts.tsv");
     if(fout.fail()){ 
         cerr << "fout failed";
         exit(-1);
     }
 
-    for (int i = 0; i < reso; i++) {
+    for (int i = 0; i <= reso; i++) {
         double theta = 10+(70/(reso)*i);
         xShifts.at(i).at(0) = theta;
         xShifts.at(i).at(1) = shift(theta);
-        fout << theta << "\t" << shift(theta) << endl;
+        fout << theta << "\t" << xShifts.at(i).at(1) << endl;
         cout << i << endl;
 	}
 

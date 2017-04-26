@@ -63,7 +63,7 @@ void GaussianBeam::calculateGaussData() {
 	double PI = 3.14159265;
 
 
-	dimset = 201;
+	dimset = 301;
 	xMax = 400;
 	// xMax=.01;
 	xMin = -xMax;
