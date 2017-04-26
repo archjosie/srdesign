@@ -63,7 +63,7 @@ void GaussianBeam::calculateGaussData() {
 	double PI = 3.14159265;
 
 
-	dimset = 401;
+	dimset = 201;
 	xMax = 400;
 	// xMax=.01;
 	xMin = -xMax;
@@ -96,36 +96,6 @@ void GaussianBeam::calculateGaussData() {
 	ReEField = ReLocal;
 	ImEField = ReLocal;
 
-	/*for (int m = 0; m < zVals.size(); ++m) {  //Weird choice, but this streamlines the program
-	//These only vary with z, so we only need to calculate them once per loop
-	double gouy = calculateGouy(zVals.at(m));
-	double radCurv = calculateRadCurv(zVals.at(m));
-	double spotSize = calculateWaist(zVals.at(m));
-
-	for (int i = 0; i < xVals.size(); ++i) {
-	for (int j = 0; j < yVals.size(); ++j) {
-
-	double r = distance(xVals.at(i), yVals.at(j));
-	double t;
-	if (abs(yVals.at(j)) < PI*1e-10) t = PI - sign(xVals.at(i))*PI / 2;
-	else t = atan(xVals.at(i) / yVals.at(j));
-
-	double imArg = -(k* zVals.at(m) + k*(pow(r, 2) / (radCurv * 2)) + l*t - gouy);
-	complex<double> expArg(0.0, imArg);
-	//cout << expArg << endl;
-
-	complex<double> phasorOut; //Uncomment if we only want to consider real component of field
-	phasorOut = laguerre(2*pow(r,2) / pow(spotSize,2), abs(l), p)*pow(sqrt(2)*r / spotSize, abs(l))*(1 / spotSize)*exp(-pow(r / spotSize, 2))*exp(expArg);
-	//cout << phasorOut << endl;
-	double realField = real(phasorOut);
-	double imagField = imag(phasorOut);
-
-	ReEField.at(i).at(j).at(m) = realField;
-	ImEField.at(i).at(j).at(m) = imagField;
-	}
-	}
-	}*/
-
 	double omega = 20 / k;
 
 	for (int i = 0; i < xVals.size(); ++i) {
@@ -134,9 +104,8 @@ void GaussianBeam::calculateGaussData() {
 
 			double reArg = -pow(k, 2)*pow(r, 2) / (pow(omega*k, 2));
 			double imArg = 0;
-			if (abs(xVals.at(i)) < PI*1e-10) imArg = -l*(PI - sign(xVals.at(i))*PI / 2);
+			if (abs(xVals.at(i)) < PI*1e-30) imArg = -l*(PI - sign(yVals.at(j))*PI / 2);
 			else imArg = -(l*atan(yVals.at(j) / xVals.at(i)));
-			//cout << reArg << endl;
 			
 			complex<double> phasorOut; //Uncomment if we only want to consider real component of field			
 			phasorOut = pow(2, abs(l) / 2)/ (omega * k) * exp(complex<double>(reArg,imArg)) * k * pow(k / (omega * k * sqrt(1 / r)), abs(l)) * laguerre(p, abs(l), 2 * pow(r, 2) * pow(k, 2) / (pow(omega*k, 2)));
@@ -147,7 +116,6 @@ void GaussianBeam::calculateGaussData() {
 
 			ReEField.at(i).at(j).at(0) = realField;
 			ImEField.at(i).at(j).at(0) = imagField;
-			
 		}
 	}
 }
@@ -242,68 +210,3 @@ int GaussianBeam::sign(double val) {
 	if (val < 0) return -1;
 	return 0;
 }
-
-void GaussianBeam::rootGraph_3d(int argc, char** argv, vector<vector<vector<double> > > Field){
-//    //Open root graphics
-//    TApplication theApp("App", &argc, argv);
-//    gStyle->SetOptStat(0);
-////    gStyle->SetPalette(82);
-//    TCanvas *c1 = new TCanvas("c1","c1",600,600);
-//    TH2F *hcontz = new TH2F("hcontz","Gaussian Beam Cross Section",40,xMin,xMax,40,yMin,yMax);
-//    Float_t px, py;
-//	for (int i = 0; i < xVals.size(); ++i) {
-//		for (int j = 0; j < yVals.size(); ++j) {
-//				hcontz->Fill(xVals.at(i),yVals.at(j),Field.at(i).at(j).at(0));
-//		}
-//	}
-////    hcontz->SetTitle("Cross Section of Gaussian Beam");
-//    hcontz->GetXaxis()->SetTitle("x"); 
-//    hcontz->GetYaxis()->SetTitle("y"); 
-//    hcontz->SetMarkerStyle(1);
-//    hcontz->GetXaxis()->CenterTitle(); 
-//    hcontz->GetYaxis()->CenterTitle(); 
-//    hcontz->SetMaximum(4);
-//    hcontz->SetMinimum(0);    
-//    hcontz->Draw("CONT1z");
-//    // Output PDF
-//    c1->Print("GBplots.pdf","pdf");
-//    theApp.Run();
-}
-
-void GaussianBeam::rootGraph_2d(int argc, char** argv, Int_t dim, vector<vector<double > > Points){
-    TApplication theApp("App", &argc, argv);
-   TCanvas *c1 = new TCanvas("c1","c1",200,10,600,400);
-   c1->SetFillColor(42);
-   c1->SetGrid();
-   const Int_t n = 20;
-   Double_t x[n], y[n];
-   for (Int_t i=0;i<n;i++) {
-      x[i] = i*0.1;
-      y[i] = 10*sin(x[i]+0.2);
-   }
-   TGraph *gr = new TGraph(n,x,y);
-   gr->SetLineColor(2);
-   gr->SetLineWidth(4);
-   gr->SetMarkerColor(4);
-   gr->SetMarkerSize(1.5);
-   gr->SetMarkerStyle(21);
-   gr->SetTitle("Option ACP example");
-   gr->GetXaxis()->SetTitle("X title");
-   gr->GetYaxis()->SetTitle("Y title");
-   gr->Draw("ACP");
-   // TCanvas::Update() draws the frame, after which one can change it
-}
-
-//void GaussianBeam::rootGraph_2d(int argc, char** argv, Int_t dim, vector<vector<double > > Points){
-//    TApplication theApp("App", &argc, argv);
-////    TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,700,500);
-//    TCanvas *c1 = new TCanvas("c1","c1",600,600);
-//    Double_t x[100], y[100];
-//    Int_t n = dim;
-//    for (Int_t i=0;i<n;i++) {
-//      x[i] = Points.at(i).at(0);
-//      y[i] = Points.at(i).at(1);
-//    }
-//    TGraph* gr = new TGraph(n,x,y);
-//    gr->Draw("AC*");
-//}

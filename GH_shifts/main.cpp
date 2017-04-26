@@ -75,7 +75,7 @@ double shift(double THETA){
     //Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
     vector<complex<double> > fVec(3, complex<double>(0, 0));
     fVec.at(0)=1;
-    fVec.at(1)=0;
+    fVec.at(1)=complex<double>(0,-1);
     fVec.at(2)=0;
 
     //Define the max xKappa and yKappa values

@@ -3,7 +3,7 @@
 // Looking for shift of -1.08401 @ 44 degrees and n=0.6592
 
 const static double PI = 3.14159265;
-const static double NVAL = 0.659283;
+const static double NVAL = 1/0.659283;
 using namespace std;
 
 complex<double> rTE(double n, double theta, vector<double> kvec){
@@ -68,7 +68,7 @@ void cres(double THETA){
 	time_t start = clock();
     //cout << "Starting Calculations" << endl;
     double k0 = 1;
-    GaussianBeam beam1(20000/k0,2*PI,0,6);
+    GaussianBeam beam1(20/k0,2*PI,0,6);
     beam1.calculateGaussData();
 	int dimset = beam1.getDims();
 
@@ -109,8 +109,8 @@ void cres(double THETA){
 		for (int j = 0; j < dimset; j++) {
 			complex<double> fourEnt(out[k][0] / dimset, out[k][1] / dimset);
 			FourData.at(i).at(j).at(0) = fourEnt;
-            if (pow(generateK(i, dimset, beam1.getK(), xKappa),2) + pow(generateK(j, dimset, beam1.getK(), yKappa),2) >= 1.0) 
-				FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
+            //if (pow(generateK(i, dimset, beam1.getK(), xKappa),2) + pow(generateK(j, dimset, beam1.getK(), yKappa),2) >= 1.0) 
+				//FourData.at(i).at(j).at(0) = (0,0); //Remove evanescence
 			k++;
 		}
 	}
@@ -159,6 +159,10 @@ void cres(double THETA){
     		ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
     		ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
 
+    		//ERTab.at(i).at(j).at(0) = fourPoint;
+    		//ERTab.at(i).at(j).at(1) = fourPoint;
+    		//ERTab.at(i).at(j).at(2) = fourPoint;
+
 			if (isnan(ERTab.at(i).at(j).at(0).real()) || isnan(ERTab.at(i).at(j).at(1).real()) || isnan(ERTab.at(i).at(j).at(2).real()) || isnan(ERTab.at(i).at(j).at(0).imag()) || isnan(ERTab.at(i).at(j).at(1).imag()) || isnan(ERTab.at(i).at(j).at(2).imag())){
             cout << ++nanc << " NAN found: " << i << ", " << j << endl;
     		ERTab.at(i).at(j).at(0) = 0;
@@ -166,7 +170,7 @@ void cres(double THETA){
     		ERTab.at(i).at(j).at(2) = 0;
             }
                 
-			}
+		}
     }
 
 	//cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
@@ -198,13 +202,14 @@ void cres(double THETA){
 	vector<vector<vector<complex<double> > > > outBeam(ERTab.size(), vector<vector<complex<double> > >(ERTab.at(0).size(), vector<complex<double> > (3, complex<double> (0,0))));
     vector<vector<vector<double> > > REoutBeam(ERTab.size(), vector<vector<double> > (ERTab.at(0).size(), vector<double> (3,0)));
 	vector<vector<vector<double> > > outBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
+	vector<vector<vector<double> > > inBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
 	vector<vector<vector<double> > > OGBeamMag(ERTab.size(), vector<vector<double> >(ERTab.at(0).size(), vector<double>(1, 0)));
 
 	//cout << "After IFT:" << endl;
 
 	k = 0;
 	for (int i = 0; i < ERTab.size(); i++) {
-		for (int j = 0; j < ERTab.at(0).size(); j++) {
+		for (int j = 0; j < ERTab.size(); j++) {
 				vector<complex<double> > fourEnt;
 				complex<double> entry1(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
 				fourEnt.push_back(entry1);
@@ -223,7 +228,6 @@ void cres(double THETA){
 	}
 
 	//cout << "Checkpoint: Heavy lifting complete. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
-
 	fftw_free(in3);
 	fftw_free(out3);
 
@@ -239,47 +243,34 @@ void cres(double THETA){
     }
 
 	for (int i = 0; i < outBeam.size(); i++){
-        for (int j = 0; j < outBeam.at(0).size(); j++){
-		    outBeamMag.at(i).at(j).at(0) = sqrt(real(outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0))) 
-            + real(outBeam.at(i).at(j).at(1) * conj(outBeam.at(i).at(j).at(1))) + real(outBeam.at(i).at(j).at(2) * conj(outBeam.at(i).at(j).at(2))));
+        for (int j = 0; j < outBeam.size(); j++){
+		    outBeamMag.at(i).at(j).at(0) = real(outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0))) 
+            + real(outBeam.at(i).at(j).at(1) * conj(outBeam.at(i).at(j).at(1))) + real(outBeam.at(i).at(j).at(2) * conj(outBeam.at(i).at(j).at(2)));
             //fout << i << "\t" << j << "\t" << outBeamMag.at(i).at(j).at(0) << endl;
+            inBeamMag.at(i).at(j).at(0)=pow(beam1.realEAt(i, j, 0),2) + pow(beam1.imagEAt(i, j, 0),2);
+            //fout << pow(real(FourData.at(i).at(j).at(0)),2) + pow(imag(FourData.at(i).at(j).at(0)),2); 
             fout << outBeamMag.at(i).at(j).at(0); 
             if(j!=outBeam.size()-1) fout << "\t";
+            //if (abs(inBeamMag.at(i).at(j).at(0) - outBeamMag.at(i).at(j).at(0)) > 1e-20) cout << "This don't match!!" << endl;
         }
         fout << endl;
     }
 
-//	for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++) 
-//		OGBeamMag.at(i).at(j).at(0) = sqrt(pow(beam1.realEAt(i,j,0),2) + pow(beam1.imagEAt(i, j, 0),2));
-//
-//    //Calculate centroid Shifts
-//	double nXrp1 = 0, nYrp1 = 0, denom = 0;
-//	
-//	for (int i = 0; i < outBeamMag.size(); i++) {
-//		for (int j = 0; j < outBeamMag.at(0).size(); j++) {
-//				nXrp1 += (j + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
-//				nYrp1 += (i + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
-//				denom += pow(outBeamMag.at(i).at(j).at(0), 2);
-//		}
-//	}
-//
-//	double nXr = nXrp1 / denom;
-//	double nYr = nYrp1 / denom;
-//    double xShift = nXr-(dimset+1)/2;
-//
-//    //Compare calculated shifts to analytical result
-//    complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
-//    complex<double> ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(beam1.getK()*sqrt(complex<double>(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
-//
-//    //cout << "Calculated" << endl;
-//    //cout << "(" << nXr-(dimset+1)/2 << "," << nYr-(dimset+1)/2 << ")" << endl;
-//
-//    //cout << "Analytical" << endl;
-//    //cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
-//
-//	//cout << "Total time elapsed: " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
-//
-//    return xShift;
+    //Calculate centroid Shifts
+	double nXrp1 = 0, nYrp1 = 0, denom = 0;
+	
+	for (int i = 0; i < outBeamMag.size(); i++) {
+		for (int j = 0; j < outBeamMag.at(0).size(); j++) {
+				nXrp1 += (j + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
+				nYrp1 += (i + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
+				denom += pow(outBeamMag.at(i).at(j).at(0), 2);
+		}
+	}
+
+	double nXr = nXrp1 / denom;
+	double nYr = nYrp1 / denom;
+    double xShift = 2*400/200*(nXr-(dimset+1)/2)/(2*PI/(632.8*pow(10, -9)))*pow(10,6);
+    cout << xShift << endl;
 }
 
 
