@@ -126,7 +126,7 @@ void GaussianBeam::calculateGaussData() {
 	}
 	}*/
 
-	double omega = 20000 / k;
+	double omega = 20000 / k; 
 
 	for (int i = 0; i < xVals.size(); ++i) {
 		for (int j = 0; j < yVals.size(); ++j) {
