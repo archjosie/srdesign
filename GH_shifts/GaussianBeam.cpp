@@ -63,9 +63,8 @@ void GaussianBeam::calculateGaussData() {
 	double PI = 3.14159265;
 
 
-	dimset = 201;
+	dimset = 201; //MUST BE ODD
 	xMax = 400000;
-	// xMax=.01;
 	xMin = -xMax;
 	xInt = 2 * xMax / (dimset - 1);
 	yMax = xMax;
@@ -136,11 +135,9 @@ void GaussianBeam::calculateGaussData() {
 			double imArg = 0;
 			if (abs(yVals.at(j)) < PI*1e-10) imArg = -l*(PI - sign(xVals.at(i))*PI / 2);
 			else imArg = -(l*atan(xVals.at(i) / yVals.at(j)));
-			//cout << reArg << endl;
 			
-			complex<double> phasorOut; //Uncomment if we only want to consider real component of field			
+			complex<double> phasorOut; 
 			phasorOut = pow(2, abs(l) / 2)/ (omega * k) * exp(reArg) * k * pow(k / (omega * k * sqrt(1 / r)), abs(l)) * laguerre(p, abs(l), 2 * pow(r, 2) * pow(k, 2) / (pow(omega*k, 2)));
-			//cout << phasorOut << endl;
 			
 			double realField = real(phasorOut);
 			double imagField = imag(phasorOut);
