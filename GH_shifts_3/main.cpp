@@ -260,7 +260,7 @@ double shift(double THETA, double L){
 
 	double nXr = nXrp1 / denom;
 	double nYr = nYrp1 / denom;
-    double xShift = 2*400000/200*(nXr-(dimset+1)/2)/(2*PI/(632.8*pow(10, -9)))*pow(10,6);
+    double yShift = 2*400000/200*(nYr-(dimset+1)/2)/(2*PI/(632.8*pow(10, -9)))*pow(10,6);
 
     //Compare calculated shifts to analytical result
     complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
@@ -274,7 +274,7 @@ double shift(double THETA, double L){
 
 	//cout << "Total time elapsed: " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
-    return xShift;
+    return yShift;
 }
 
 
