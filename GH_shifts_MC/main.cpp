@@ -3,7 +3,7 @@
 // Looking for shift of -1.08401 @ 44 degrees and n=0.6592
 
 const static double PI = 3.14159265;
-const static double NVAL = 1.5168;
+//const static double NVAL = 1.5168;
 const static double incang = 60;
 //const static double WIDTH = 13.720088565627512;
 using namespace std;
@@ -54,7 +54,7 @@ double findMax(vector<double> vals) {
 	return max;
 }
 
-vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vector<double>  REkVecs, double WIDTH) {
+vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vector<double>  REkVecs, double WIDTH, double NVAL) {
 	vector<complex<double> > theVec(3, complex<double> (0,0));
 	vector<complex<double> > kVecs(0, complex<double> (0,0));
     kVecs.push_back(complex<double>(REkVecs.at(0),0));
@@ -74,10 +74,15 @@ double chop(double num) {
 	return num;
 }
 
-double shift(double THETA, double L){
+double shiftMC(double THETA, double L){
 	time_t start = clock();
     //cout << "Starting Calculations" << endl;
-    double k0 = 1;
+
+    srand(time(NULL));
+    double k0 = (rand() *20) + 1;
+    double lambda = (rand()*400) + 300;
+    double N = rand() + 1; 
+
     GaussianBeam beam1(20000/k0,2*PI,0,0);
     beam1.calculateGaussData();
 	int dimset = beam1.getDims();
@@ -85,7 +90,7 @@ double shift(double THETA, double L){
     //Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
     vector<complex<double> > fVec(3, complex<double>(0, 0));
     fVec.at(0)=1;
-    fVec.at(1)=complex<double>(0,1);
+    fVec.at(1)=0;
     fVec.at(2)=0;
 
     //Define the max xKappa and yKappa values
@@ -152,7 +157,7 @@ double shift(double THETA, double L){
 			double kz = sqrt(1 - pow(kx, 2) - pow(ky, 2));
 			if (isnan(kz)) kVec.push_back(0);
 			else kVec.push_back(kz);
-			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec, L);
+			eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec, L, N);
 		}
 	}
 
@@ -260,11 +265,11 @@ double shift(double THETA, double L){
 
 	double nXr = nXrp1 / denom;
 	double nYr = nYrp1 / denom;
-    double yShift = 2*400000/200*(nYr-(dimset+1)/2)/(2*PI/(632.8*pow(10, -9)))*pow(10,6);
+    double yShift = 2*400000/200*(nYr-(dimset+1)/2)/(2*PI/(lambda*pow(10, -9)))*pow(10,6);
 
     //Compare calculated shifts to analytical result
-    complex<double> ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
-    complex<double> ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(beam1.getK()*sqrt(complex<double>(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
+    complex<double> ARshift1 = (4*pow(N,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(N,2)+(1+pow(N,2))*cos(2*THETA*PI/180))*sqrt(complex<double>(-1*pow(N,2)+pow(sin(THETA*PI/180),2),0)));
+    complex<double> ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(beam1.getK()*sqrt(complex<double>(1-2*pow(N,2)-cos(2*THETA*PI/180),0)));
 
     //cout << "Calculated" << endl;
     //cout << "(" << nXr-(dimset+1)/2 << "," << nYr-(dimset+1)/2 << ")" << endl;
@@ -278,28 +283,40 @@ double shift(double THETA, double L){
 }
 
 
-int main(int argc, char** argv){
-    GaussianBeam beam1(20,2*PI,0,0);
-    int reso = 35;
-    ofstream fout;
-    vector<vector<double> > xShifts(reso+1, vector<double>(2,0));
-    fout.open("GH_shifts.tsv");
-    if(fout.fail()){ 
-        cerr << "fout failed";
-        exit(-1);
+vector<double> MC_driver(int rolls){
+    vector<double> results(2,0);
+    vector<double> shiftApp(rolls, 0);
+    for (int i = 0; i < rolls; i++) {
+        double L = 14;
+        shiftApp.at(i) = shiftMC(incang, L);
+        cout << i << endl;
     }
 
-    for (int i = 0; i <= reso; i++) {
-        double L = 1.0+(14.0/(reso)*i);
-        xShifts.at(i).at(0) = L;
-        xShifts.at(i).at(1) = shift(incang, L);
-        fout << L << "\t" << xShifts.at(i).at(1) << endl;
-        cout << i << endl;
-	}
+    double shiftSum = 0;
+    for (int i = 0; i < shiftApp.size(); i++) shiftSum += shiftApp.at(i);
+    results.at(0) =  shiftSum / rolls;
+   
+    double variance = 0;
+    for (int i = 0; i < shiftApp.size(); i++) variance += shiftApp.at(i) - results.at(0);
+    results.at(1) = variance / (rolls-1);
+
+    return results;
+}
+
+int main(int argc, char** argv){
+    
+    ofstream fout;
+    fout.open("MCoutputs.tsv");
+    if (fout.fail()) {
+	cerr << "Something went wrong!" << endl;
+	exit(1);
+    }
+
+    for (int i = 25; i < 2000; i=i*2) {
+        vector<double> MCres = MC_driver(i);
+        fout << i << "\t" << MCres.at(0) << "\t" << MCres.at(1) << endl;
+    }
 
     fout.close();
-
-    //beam1.rootGraph_2d(argc, argv, reso,  xShifts);
-
     return 0;
 }
