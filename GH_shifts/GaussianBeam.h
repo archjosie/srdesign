@@ -9,7 +9,7 @@
 #include <fstream>
 #include <vector>
 #include <complex>
-
+/*
 #include <TCanvas.h>
 #include <TROOT.h>
 #include <TGraphErrors.h>
@@ -29,7 +29,7 @@
 #include <TRandom.h>
 #include <TColor.h>
 #include <TExec.h>
-
+*/
 
 #include<fftw3.h>
 
@@ -75,8 +75,8 @@ public:
 	double realEAt(int i, int j, int k);
 	double imagEAt(int i, int j, int k);
 
-    void rootGraph_3d(int argc, char** argv, vector<vector<vector<double> > > Field);
-    void rootGraph_2d(int argc, char** argv, Int_t dim, vector<vector<double> > Points);
+//    void rootGraph_3d(int argc, char** argv, vector<vector<vector<double> > > Field);
+//    void rootGraph_2d(int argc, char** argv, Int_t dim, vector<vector<double> > Points);
 };
 
 #endif

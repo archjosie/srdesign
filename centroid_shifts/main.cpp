@@ -3,34 +3,42 @@
 using namespace std;
 
 const static double NVAL = 0.659283;
-const static double THETA = 60.0;
+const static double THETA = 45.0;
 
 // Declarations
 // ============
 
-// Fourier Tranform Beam
-// ---------------------
-beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKappa, double yKappa);
-
-// Do Calculation in Fourier Space
-// -------------------------------
-beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double yKappa,vector<intensity> fVec, beam<intensity> FourData);
-
-
-// Helper functions
-// ----------------
-
-intensity rTE(double n, double theta, vector<double> kvec);
-intensity rTM(double n, double theta, vector<double> kvec);
-double generateK(int index, int dimsize, int k, int xmax);
-double findMax(vector<double> vals);
-vector<intensity> eRBase (vector<intensity> f, double theta, vector<double>  REkVecs);
-double chop(double num);
-int sign(double val);
+    // Fourier Tranform Beam
+    // ---------------------
+    beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKappa, double yKappa);
+    
+    // Do Calculation in Fourier Space
+    // -------------------------------
+    beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double yKappa,vector<intensity> fVec, beam<intensity> FourData);
+    
+        // Calculate eRTab
+        // ...............
+        vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs);
+    
+    // Inverse Fourier Tranform Beam
+    // -----------------------------
+    beam<intensity> invFourierTransformBeam(beam<intensity> ERTab);
+    
+    // Calculate Centroid Shifts
+    // -----------------------------
+    void centroidShifts(GaussianBeam beam1, beam<intensity> outBeam, int dimset);
+    
+    // Helper functions
+    // ----------------
+    intensity rTE(double n, double theta, vector<double> kvec);
+    intensity rTM(double n, double theta, vector<double> kvec);
+    double generateK(int index, int dimsize, int k, int xmax);
+    double findMax(vector<double> vals);
+    double chop(double num);
+    int sign(double val);
 
 // Main
 // ====
-
 int main(int argc, char** argv){
     time_t start = clock();
     cout << "Starting Calculations" << endl;
@@ -41,7 +49,11 @@ int main(int argc, char** argv){
     beam1.calculateGaussData();
     int dimset = beam1.getDims();
 
-    // Assuming horizontal polarization. According to Centroid Shifts paper, f={1,0,0}
+    //Input three-component polarization vector (no need to normalize). Valid entries are:
+    //Horizontal: {1,0,0}
+    //Vertical: {0,1,0}
+    //CCW Cicular: {1,i,0}
+    //CW Circular: {1,-i,0}
     vector<intensity> fVec(3, intensity(0, 0));
     fVec.at(0) = 1;
     fVec.at(1) = complex<double>(0,-1);
@@ -53,7 +65,7 @@ int main(int argc, char** argv){
 
     beam<intensity> FourData = fourierTransformBeam(beam1, dimset, xKappa, yKappa);
 
-/*   // Rotate three dimensional
+	// Recenter the Fourier data via 2D rotation
     for (int i = 0; i < FourData.size(); i++) {
         for (int j = 0; j < (FourData.size() + 1) / 2; j++) {
             FourData.at(i).push_back(FourData.at(i).at(0));
@@ -65,94 +77,14 @@ int main(int argc, char** argv){
         FourData.push_back(FourData.at(0));
         FourData.erase(FourData.begin());
     }
-*/
+
     beam<intensity> ERTab = beamCalcs(beam1, dimset, xKappa, yKappa, fVec, FourData);
 
     cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
-    fftw_complex *in3, *out3;
-    in3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
-    out3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
+    beam<intensity> outBeam = invFourierTransformBeam(ERTab);
 
-    int k = 0;
-    for (int i = 0; i < ERTab.size(); i++) {
-        for (int j = 0; j < ERTab.at(0).size(); j++) {
-            in3[k][0] = real(ERTab.at(i).at(j).at(0));
-            in3[k][1] = -imag(ERTab.at(i).at(j).at(0));
-            k++;
-
-            in3[k][0] = real(ERTab.at(i).at(j).at(1));
-            in3[k][1] = -imag(ERTab.at(i).at(j).at(1));
-            k++;
-
-            in3[k][0] = real(ERTab.at(i).at(j).at(2));
-            in3[k][1] = -imag(ERTab.at(i).at(j).at(2));
-            k++;
-        }
-    }
-
-    fftw_plan h3 = fftw_plan_dft_3d(ERTab.size(), ERTab.at(0).size(), 3, in3, out3, FFTW_BACKWARD, FFTW_ESTIMATE);
-    fftw_execute(h3);
-
-    beam<intensity>  outBeam(ERTab.size(), vector2D<intensity> (ERTab.at(0).size(), vector<intensity> (3, intensity (0,0))));
-    beam<coordinate> REoutBeam(ERTab.size(), vector2D<intensityReal> (ERTab.at(0).size(), vector<intensityReal> (3,0)));
-    beam<coordinate> outBeamMag(ERTab.size(), vector2D<double>(ERTab.at(0).size(), vector<double>(1, 0)));
-    beam<coordinate> OGBeamMag(ERTab.size(), vector2D<double>(ERTab.at(0).size(), vector<double>(1, 0)));
-
-    k = 0;
-    for (int i = 0; i < ERTab.size(); i++) {
-        for (int j = 0; j < ERTab.at(0).size(); j++) {
-                vector<intensity> fourEnt;
-                intensity entry1(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
-                fourEnt.push_back(entry1);
-                k++;
-
-                intensity entry2(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
-                fourEnt.push_back(entry2);
-                k++;
-
-                intensity entry3(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
-                fourEnt.push_back(entry3);
-                k++;
-
-                outBeam.at(i).at(j) = fourEnt;
-        }
-    }
-
-    cout << "Checkpoint: Heavy lifting complete. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
-
-    fftw_free(in3);
-    fftw_free(out3);
-
-    fftw_destroy_plan(h3);
-
-    // Calculate magnitude of both beams for comparision
-    for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++)
-        outBeamMag.at(i).at(j).at(0) = sqrt(real(outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0))) + real(outBeam.at(i).at(j).at(1) * conj(outBeam.at(i).at(j).at(1))) + real(outBeam.at(i).at(j).at(2) * conj(outBeam.at(i).at(j).at(2))));
-
-    for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++)
-        OGBeamMag.at(i).at(j).at(0) = sqrt(pow(beam1.realEAt(i,j,0),2) + pow(beam1.imagEAt(i, j, 0),2));
-
-    // Calculate centroid Shifts
-    double nXrp1 = 0, nYrp1 = 0, denom = 0;
-
-    for (int i = 0; i < outBeamMag.size(); i++) {
-        for (int j = 0; j < outBeamMag.at(0).size(); j++) {
-                nXrp1 += (j + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
-                nYrp1 += (i + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
-                denom += pow(outBeamMag.at(i).at(j).at(0), 2);
-        }
-    }
-
-    double nXr = nXrp1 / denom;
-    double nYr = nYrp1 / denom;
-
-    // Compare calculated shifts to analytical result
-    intensity ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(intensity(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
-    intensity ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(beam1.getK()*sqrt(intensity(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
-
-    cout << "Calculated" << endl;
-    cout << "(" << nXr << "," << nYr << ")" << endl;
+    centroidShifts(beam1, outBeam, dimset);
 
     cout << "Total time elapsed: " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
@@ -162,7 +94,6 @@ int main(int argc, char** argv){
 
 // Fourier Tranform Beam
 // ---------------------
-
 beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKappa, double yKappa){
     // Generate the input and output vectors for fftw
     fftw_complex *in, *out;
@@ -200,6 +131,7 @@ beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKap
         }
     }
 
+    // Clean up fftw
     fftw_free(in);
     fftw_free(out);
     fftw_destroy_plan(g);
@@ -213,6 +145,7 @@ beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double 
     // Calculate scalar that represents collision with beam
     beam<intensity> eRTab(dimset, vector2D<intensity> (dimset, vector<intensity>(3, intensity(0, 0))));
 
+    // Could probably split this up a bit more
     for (int j = 0; j < dimset; j++) {
         for (int i = 0; i < dimset; i++) {
             vector<double> kVec = vector<double> (0,0);
@@ -231,6 +164,7 @@ beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double 
 
 //    cout << "Checkpoint: ETilde generated. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
+    // Multiple the scalar with the FT beam
     beam<intensity> ERTab(dimset, vector2D<intensity> (dimset, vector<intensity>(3, intensity(0, 0))));
     int nanc = 0;
 
@@ -241,12 +175,23 @@ beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double 
             ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * fourPoint;
             ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
             ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
+
+            //Catch NaNs and set the corresponding points to 0
+            if (isnan(ERTab.at(i).at(j).at(0).real()) || isnan(ERTab.at(i).at(j).at(1).real()) || isnan(ERTab.at(i).at(j).at(2).real()) || isnan(ERTab.at(i).at(j).at(0).imag()) || isnan(ERTab.at(i).at(j).at(1).imag()) || isnan(ERTab.at(i).at(j).at(2).imag())){
+                cout << ++nanc << " NAN found: " << i << ", " << j << endl;
+                ERTab.at(i).at(j).at(0) = 0;
+                ERTab.at(i).at(j).at(1) = 0;
+                ERTab.at(i).at(j).at(2) = 0;
+            }
             }
     }
     return ERTab;
 }
 
-vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs) {
+// Calculate eRTab
+// ...............
+vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs){
+    // Load various vectors for ERTab Calc
     vector<intensity> theVec(3, intensity (0,0));
     vector<intensity> kVecs(0, intensity (0,0));
     kVecs.push_back(intensity(REkVecs.at(0),0));
@@ -255,17 +200,125 @@ vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkV
     intensity refTM = rTM(NVAL, theta, REkVecs);
     intensity refTE = rTE(NVAL, theta, REkVecs);
 
-    theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
-    theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
-    theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
+    // Perform calculations with said vector
+    theVec.at(0) = f.at(0) * refTM - f.at(1) * kVecs.at(1)*(1 / tan(theta * PI/180)) * (refTM + refTE);
+    theVec.at(1) = f.at(1) * refTE + f.at(0) * kVecs.at(1)*(1 / tan(theta * PI/180)) * (refTM + refTE);
+    theVec.at(2) = -f.at(0) * refTM * kVecs.at(0) - f.at(1) * refTE * kVecs.at(1);
 
     return theVec;
+}
+
+// Inverse Fourier Tranform Beam
+// -----------------------------
+beam<intensity> invFourierTransformBeam(beam<intensity> ERTab){
+
+    // Declare fftw types
+    fftw_complex *in3, *out3;
+    in3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
+    out3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
+
+    // Put real and imaginary vector components into the fftw types
+    int k = 0;
+    for (int i = 0; i < ERTab.size(); i++) {
+        for (int j = 0; j < ERTab.at(0).size(); j++) {
+            in3[k][0] = real(ERTab.at(i).at(j).at(0));
+            in3[k][1] = -imag(ERTab.at(i).at(j).at(0));
+            k++;
+
+            in3[k][0] = real(ERTab.at(i).at(j).at(1));
+            in3[k][1] = -imag(ERTab.at(i).at(j).at(1));
+            k++;
+
+            in3[k][0] = real(ERTab.at(i).at(j).at(2));
+            in3[k][1] = -imag(ERTab.at(i).at(j).at(2));
+            k++;
+        }
+    }
+
+    // Decalare and execute plan
+    fftw_plan h3 = fftw_plan_dft_3d(ERTab.size(), ERTab.at(0).size(), 3, in3, out3, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_execute(h3);
+
+    // Declare and store inverse Fourier data
+    beam<intensity>  outBeam(ERTab.size(), vector2D<intensity> (ERTab.at(0).size(), vector<intensity> (3, intensity (0,0))));
+    //beam<coordinate> REoutBeam(ERTab.size(), vector2D<intensityReal> (ERTab.at(0).size(), vector<intensityReal> (3,0)));
+
+    k = 0;
+    for (int i = 0; i < ERTab.size(); i++) {
+        for (int j = 0; j < ERTab.at(0).size(); j++) {
+                vector<intensity> fourEnt;
+                intensity entry1(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
+                fourEnt.push_back(entry1);
+                k++;
+
+                intensity entry2(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
+                fourEnt.push_back(entry2);
+                k++;
+
+                intensity entry3(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
+                fourEnt.push_back(entry3);
+                k++;
+
+                outBeam.at(i).at(j) = fourEnt;
+        }
+    }
+
+    //cout << "Checkpoint: Heavy lifting complete. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
+
+    // fftw cleanup
+    fftw_free(in3);
+    fftw_free(out3);
+    fftw_destroy_plan(h3);
+
+    return outBeam;
+}
+
+// Calculate Centroid Shifts
+// -----------------------------
+void centroidShifts(GaussianBeam beam1, beam<intensity> outBeam, int dimset){
+    // Create magnitude vectors to account for real and imag
+    beam<double> outBeamMag(outBeam.size(), vector2D<double>(outBeam.at(0).size(), vector<double>(1, 0)));
+    beam<double> OGBeamMag(outBeam.size(), vector2D<double>(outBeam.at(0).size(), vector<double>(1, 0)));
+
+    // Calculate magnitude of both beams for comparision
+    for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++)
+        outBeamMag.at(i).at(j).at(0) = sqrt(real(outBeam.at(i).at(j).at(0) * conj(outBeam.at(i).at(j).at(0))) + real(outBeam.at(i).at(j).at(1) * conj(outBeam.at(i).at(j).at(1))) + real(outBeam.at(i).at(j).at(2) * conj(outBeam.at(i).at(j).at(2))));
+
+    for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++)
+        OGBeamMag.at(i).at(j).at(0) = sqrt(pow(beam1.realEAt(i,j,0),2) + pow(beam1.imagEAt(i, j, 0),2));
+
+    // Calculate centroid Shifts
+    double nXrp1 = 0, nYrp1 = 0, denom = 0;
+
+    for (int i = 0; i < outBeamMag.size(); i++) {
+        for (int j = 0; j < outBeamMag.at(0).size(); j++) {
+                nXrp1 += (j + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
+                nYrp1 += (i + 1) * pow(outBeamMag.at(j).at(i).at(0), 2);
+                denom += pow(outBeamMag.at(i).at(j).at(0), 2);
+        }
+    }
+
+    double nXr = nXrp1 / denom;
+    double nYr = nYrp1 / denom;
+    double xShift = 2*400000/200*(nXr-(dimset+1)/2)/(2*PI/(632.8*pow(10, -9)))*pow(10,6);
+
+    // Compare calculated shifts to analytical result
+    //intensity ARshift1 = (4*pow(NVAL,2)*sin(THETA*PI/180))/(beam1.getK()*(-1+pow(NVAL,2)+(1+pow(NVAL,2))*cos(2*THETA*PI/180))*sqrt(intensity(-1*pow(NVAL,2)+pow(sin(THETA*PI/180),2),0)));
+    //intensity ARshift2 = -2*sqrt(2)*sin(THETA*PI/180)/(beam1.getK()*sqrt(intensity(1-2*pow(NVAL,2)-cos(2*THETA*PI/180),0)));
+
+    cout << "Calculated" << endl;
+    cout << "(" << nXr << "," << nYr << ")" << endl;
+    //cout << "Analytica" << endl;
+    //cout << "(" << ARshift1 << "," << ARshift2 << ")" << endl;
+
+    cout << xShift << endl;
+
+    return;
 }
 
 
 // Helper functions
 // ----------------
-
 intensity rTE(double n, double theta, vector<double> kvec) {
     theta *= PI / 180;
     vector<double> nvec;

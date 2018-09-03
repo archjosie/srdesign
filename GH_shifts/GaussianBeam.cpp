@@ -240,7 +240,7 @@ int GaussianBeam::sign(double val) {
 	return 0;
 }
 
-void GaussianBeam::rootGraph_3d(int argc, char** argv, vector<vector<vector<double> > > Field){
+//void GaussianBeam::rootGraph_3d(int argc, char** argv, vector<vector<vector<double> > > Field){
 //    //Open root graphics
 //    TApplication theApp("App", &argc, argv);
 //    gStyle->SetOptStat(0);
@@ -265,8 +265,9 @@ void GaussianBeam::rootGraph_3d(int argc, char** argv, vector<vector<vector<doub
 //    // Output PDF
 //    c1->Print("GBplots.pdf","pdf");
 //    theApp.Run();
-}
+//}
 
+/*
 void GaussianBeam::rootGraph_2d(int argc, char** argv, Int_t dim, vector<vector<double > > Points){
     TApplication theApp("App", &argc, argv);
    TCanvas *c1 = new TCanvas("c1","c1",200,10,600,400);
@@ -290,7 +291,7 @@ void GaussianBeam::rootGraph_2d(int argc, char** argv, Int_t dim, vector<vector<
    gr->Draw("ACP");
    // TCanvas::Update() draws the frame, after which one can change it
 }
-
+*/
 //void GaussianBeam::rootGraph_2d(int argc, char** argv, Int_t dim, vector<vector<double > > Points){
 //    TApplication theApp("App", &argc, argv);
 ////    TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,700,500);

@@ -76,7 +76,7 @@ void GaussianBeam::calculateGaussData() {
     ReEField = ReLocal;
     ImEField = ReLocal;
 
-    double omega = 20 / k;
+    double omega = 20000 / k;
 
     for (int i = 0; i < xVals.size(); ++i) {
         for (int j = 0; j < yVals.size(); ++j) {

@@ -61,9 +61,9 @@ vector<complex<double> > eRBase (vector<complex<double> > f, double theta, vecto
     complex<double> refTE = rTE(NVAL, theta, REkVecs);
 	
 	//Use known beam behavior to return output beam's wave vector
-	theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
-	theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
-	theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
+	theVec.at(0) = f.at(0) * refTM - f.at(1) * kVecs.at(1) * (1 / tan(theta * PI/180)) * (refTM + refTE);
+	theVec.at(1) = f.at(1) * refTE + f.at(0) * kVecs.at(1) * (1 / tan(theta * PI/180)) * (refTM + refTE);
+	theVec.at(2) = -f.at(0) * refTM * kVecs.at(0) - f.at(1) * refTE * kVecs.at(1);
 	return theVec;
 }
 
@@ -288,13 +288,15 @@ double shift(double THETA){
 
 	//cout << "Total time elapsed: " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 	//Uncomment for timing studies
+    //cout
 
     return xShift;
 }
 
 
 int main(int argc, char** argv){
-    int reso = 35;
+    //int reso = 35;
+    int reso = 1;
     ofstream fout;
     vector<vector<double> > xShifts(reso+1, vector<double>(2,0));
     fout.open("GH_shifts.tsv");
@@ -305,11 +307,13 @@ int main(int argc, char** argv){
 
     for (int i = 0; i <= reso; i++) {
 		//Perform single-interface analysis across multiple angles and write to file
-        double theta = 10+(70/(reso)*i);
+        //double theta = 10+(70/(reso)*i);
+        double theta = 45.0;
         xShifts.at(i).at(0) = theta;
         xShifts.at(i).at(1) = shift(theta);
-        fout << theta << "\t" << xShifts.at(i).at(1) << endl;
+        //fout << theta << "\t" << xShifts.at(i).at(1) << endl;
         cout << i << endl;
+        cout << theta << "\t" << xShifts.at(i).at(1) << endl;
 	}
 
     fout.close();
