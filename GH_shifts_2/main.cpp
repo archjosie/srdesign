@@ -77,7 +77,7 @@ double shift(double THETA){
 	time_t start = clock();
     //cout << "Starting Calculations" << endl;
     double k0 = 1;
-    GaussianBeam beam1(20000/k0,2*PI,0,5);
+    GaussianBeam beam1(20000/k0,2*PI,0,7);
     beam1.calculateGaussData();
 	int dimset = beam1.getDims();
 
@@ -293,7 +293,7 @@ int main(int argc, char** argv){
         xShifts.at(i).at(0) = theta;
         xShifts.at(i).at(1) = shift(theta);
         fout << theta << "\t" << xShifts.at(i).at(1) << endl;
-        cout << i << endl;
+        cout << i  << xShifts.at(i).at(1) << endl;
 	}
 
     fout.close();
