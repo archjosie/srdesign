@@ -10,9 +10,12 @@ const static double THETA = 60.0;
 
 // Fourier Tranform Beam
 // ---------------------
-//beam<intensity> fourierTransformBeam(GaussianBeam beam1){
-//    return
-//}
+beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKappa, double yKappa);
+
+// Do Calculation in Fourier Space
+// -------------------------------
+beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double yKappa,vector<intensity> fVec, beam<intensity> FourData);
+
 
 // Helper functions
 // ----------------
@@ -48,41 +51,7 @@ int main(int argc, char** argv){
     double xKappa = findMax(beam1.getXVals());
     double yKappa = findMax(beam1.getYVals());
 
-    // Generate the input and output vectors for fftw
-    fftw_complex *in, *out, *in3, *out3;
-    in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dimset * dimset);
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dimset * dimset);
-
-    // Create plane for forward transform
-    fftw_plan g = fftw_plan_dft_2d(dimset, dimset, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-    int k = 0;
-    for (int i = 0; i < dimset; i++) {
-        for (int j = 0; j < dimset; j++) {
-            in[k][0] = beam1.realEAt(i, j, 0);
-            in[k][1] = beam1.imagEAt(i, j, 0);
-            k++;
-        }
-    }
-
-    cout << "Checkpoint: Fourier array prepared. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
-    
-    // Do forward Fourier transform. Results are stored in "out"
-    fftw_execute(g);
-
-    // Extract Fourier data into a complex valued beam intensity
-    beam<intensity> FourData(dimset, vector2D<intensity>  (dimset, vector<intensity>(1, intensity(0, 0))));
-
-    k = 0;
-    for (int i = 0; i < dimset; i++) {
-        for (int j = 0; j < dimset; j++) {
-            intensity fourEnt(out[k][0] / dimset, out[k][1] / dimset);
-            FourData.at(i).at(j).at(0) = fourEnt;
-            // Remove evanescence
-            if (pow(generateK(i, dimset, beam1.getK(), xKappa), 2) + pow(generateK(j, dimset, beam1.getK(), yKappa), 2) >= 1.0)
-                FourData.at(i).at(j).at(0) = (0,0);             
-            k++;
-        }
-    }
+    beam<intensity> FourData = fourierTransformBeam(beam1, dimset, xKappa, yKappa);
 
 /*   // Rotate three dimensional
     for (int i = 0; i < FourData.size(); i++) {
@@ -97,46 +66,15 @@ int main(int argc, char** argv){
         FourData.erase(FourData.begin());
     }
 */
-    // Calculate scalar that represents collision with beam
-    beam<intensity> eRTab(dimset, vector2D<intensity> (dimset, vector<intensity>(3, intensity(0, 0))));
-
-    for (int j = 0; j < dimset; j++) {
-        for (int i = 0; i < dimset; i++) {
-            vector<double> kVec = vector<double> (0,0);
-            double kx = generateK(i + 1, dimset, beam1.getK(), xKappa);
-            double ky = generateK(j + 1, dimset, beam1.getK(), yKappa);
-
-            kVec.push_back(kx);
-            kVec.push_back(ky);
-
-            double kz = sqrt(1 - pow(kx, 2) - pow(ky, 2));
-            if (isnan(kz)) kVec.push_back(0);
-            else kVec.push_back(kz);
-            eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
-        }
-    }
-
-    cout << "Checkpoint: ETilde generated. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
-
-    beam<intensity> ERTab(dimset, vector2D<intensity> (dimset, vector<intensity>(3, intensity(0, 0))));
-    int nanc = 0;
-
-    for (int i = 0; i < dimset; i++) {
-        for (int j = 0; j < dimset; j++) {
-            intensity fourPoint(FourData.at(i).at(j).at(0).real(), -FourData.at(i).at(j).at(0).imag());
-
-            ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * fourPoint;
-            ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
-            ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
-            }
-    }
+    beam<intensity> ERTab = beamCalcs(beam1, dimset, xKappa, yKappa, fVec, FourData);
 
     cout << "Checkpoint: Ready for IFFT. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
+    fftw_complex *in3, *out3;
     in3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
     out3 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * ERTab.size() * ERTab.at(0).size() * 3);
 
-    k = 0;
+    int k = 0;
     for (int i = 0; i < ERTab.size(); i++) {
         for (int j = 0; j < ERTab.at(0).size(); j++) {
             in3[k][0] = real(ERTab.at(i).at(j).at(0));
@@ -183,13 +121,10 @@ int main(int argc, char** argv){
 
     cout << "Checkpoint: Heavy lifting complete. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
-    fftw_free(in);
-    fftw_free(out);
     fftw_free(in3);
     fftw_free(out3);
 
     fftw_destroy_plan(h3);
-    fftw_destroy_plan(g);
 
     // Calculate magnitude of both beams for comparision
     for (int i = 0; i < outBeam.size(); i++) for (int j = 0; j < outBeam.at(0).size(); j++)
@@ -223,6 +158,110 @@ int main(int argc, char** argv){
 
     return 0;
 }
+
+
+// Fourier Tranform Beam
+// ---------------------
+
+beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKappa, double yKappa){
+    // Generate the input and output vectors for fftw
+    fftw_complex *in, *out;
+    in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dimset * dimset);
+    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dimset * dimset);
+
+    // Create plane for forward transform
+    fftw_plan g = fftw_plan_dft_2d(dimset, dimset, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    int k = 0;
+    for (int i = 0; i < dimset; i++) {
+        for (int j = 0; j < dimset; j++) {
+            in[k][0] = beam1.realEAt(i, j, 0);
+            in[k][1] = beam1.imagEAt(i, j, 0);
+            k++;
+        }
+    }
+
+//    cout << "Checkpoint: Fourier array prepared. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
+    
+    // Do forward Fourier transform. Results are stored in "out"
+    fftw_execute(g);
+
+    // Extract Fourier data into a complex valued beam intensity
+    beam<intensity> FourData(dimset, vector2D<intensity>  (dimset, vector<intensity>(1, intensity(0, 0))));
+
+    k = 0;
+    for (int i = 0; i < dimset; i++) {
+        for (int j = 0; j < dimset; j++) {
+            intensity fourEnt(out[k][0] / dimset, out[k][1] / dimset);
+            FourData.at(i).at(j).at(0) = fourEnt;
+            // Remove evanescence
+            if (pow(generateK(i, dimset, beam1.getK(), xKappa), 2) + pow(generateK(j, dimset, beam1.getK(), yKappa), 2) >= 1.0)
+                FourData.at(i).at(j).at(0) = (0,0);             
+            k++;
+        }
+    }
+
+    fftw_free(in);
+    fftw_free(out);
+    fftw_destroy_plan(g);
+
+    return FourData;
+}
+
+// Do Calculation in Fourier Space
+// -------------------------------
+beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double yKappa,vector<intensity> fVec, beam<intensity> FourData){
+    // Calculate scalar that represents collision with beam
+    beam<intensity> eRTab(dimset, vector2D<intensity> (dimset, vector<intensity>(3, intensity(0, 0))));
+
+    for (int j = 0; j < dimset; j++) {
+        for (int i = 0; i < dimset; i++) {
+            vector<double> kVec = vector<double> (0,0);
+            double kx = generateK(i + 1, dimset, beam1.getK(), xKappa);
+            double ky = generateK(j + 1, dimset, beam1.getK(), yKappa);
+
+            kVec.push_back(kx);
+            kVec.push_back(ky);
+
+            double kz = sqrt(1 - pow(kx, 2) - pow(ky, 2));
+            if (isnan(kz)) kVec.push_back(0);
+            else kVec.push_back(kz);
+            eRTab.at(i).at(j) = eRBase(fVec, THETA, kVec);
+        }
+    }
+
+//    cout << "Checkpoint: ETilde generated. " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
+
+    beam<intensity> ERTab(dimset, vector2D<intensity> (dimset, vector<intensity>(3, intensity(0, 0))));
+    int nanc = 0;
+
+    for (int i = 0; i < dimset; i++) {
+        for (int j = 0; j < dimset; j++) {
+            intensity fourPoint(FourData.at(i).at(j).at(0).real(), -FourData.at(i).at(j).at(0).imag());
+
+            ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * fourPoint;
+            ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
+            ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
+            }
+    }
+    return ERTab;
+}
+
+vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs) {
+    vector<intensity> theVec(3, intensity (0,0));
+    vector<intensity> kVecs(0, intensity (0,0));
+    kVecs.push_back(intensity(REkVecs.at(0),0));
+    kVecs.push_back(intensity(REkVecs.at(1),0));
+    kVecs.push_back(intensity(REkVecs.at(2),0));
+    intensity refTM = rTM(NVAL, theta, REkVecs);
+    intensity refTE = rTE(NVAL, theta, REkVecs);
+
+    theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
+    theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
+    theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
+
+    return theVec;
+}
+
 
 // Helper functions
 // ----------------
@@ -268,21 +307,6 @@ double findMax(vector<double> vals) {
     return max;
 }
 
-vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs) {
-    vector<intensity> theVec(3, intensity (0,0));
-    vector<intensity> kVecs(0, intensity (0,0));
-    kVecs.push_back(intensity(REkVecs.at(0),0));
-    kVecs.push_back(intensity(REkVecs.at(1),0));
-    kVecs.push_back(intensity(REkVecs.at(2),0));
-    intensity refTM = rTM(NVAL, theta, REkVecs);
-    intensity refTE = rTE(NVAL, theta, REkVecs);
-
-    theVec.at(0) = f.at(0)*refTM - f.at(1)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
-    theVec.at(1) = f.at(1)*refTE + f.at(0)*kVecs.at(1)*(1 / tan(theta*PI/180))*(refTM + refTE);
-    theVec.at(2) = -f.at(0)*refTM*kVecs.at(0) - f.at(1)*refTE*kVecs.at(1);
-
-    return theVec;
-}
 
 double chop(double num) {
     if (abs(num) < 1e-12) return 0;
