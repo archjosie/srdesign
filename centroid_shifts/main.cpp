@@ -8,38 +8,40 @@ const static double THETA = 45.0;
 // Declarations
 // ============
 
-    // Fourier Tranform Beam
-    // ---------------------
-    beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKappa, double yKappa);
-    
-    // Do Calculation in Fourier Space
-    // -------------------------------
-    beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double yKappa,vector<intensity> fVec, beam<intensity> FourData);
-    
-        // Calculate eRTab
-        // ...............
-        vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs);
-    
-    // Inverse Fourier Tranform Beam
-    // -----------------------------
-    beam<intensity> invFourierTransformBeam(beam<intensity> ERTab);
-    
-    // Calculate Centroid Shifts
-    // -----------------------------
-    void centroidShifts(GaussianBeam beam1, beam<intensity> outBeam, int dimset);
-    
-    // Helper functions
-    // ----------------
-    intensity rTE(double n, double theta, vector<double> kvec);
-    intensity rTM(double n, double theta, vector<double> kvec);
-    double generateK(int index, int dimsize, int k, int xmax);
-    double findMax(vector<double> vals);
-    double chop(double num);
-    int sign(double val);
+// Fourier Tranform Beam
+// ---------------------
+beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKappa, double yKappa);
+
+// Do Calculation in Fourier Space
+// -------------------------------
+beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double yKappa,vector<intensity> fVec, beam<intensity> FourData);
+
+// ### Calculate eRTab ###
+vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs);
+
+// ### Find NaN's and Set Them to Zero ###
+bool nanFinder (vector<intensity> ERTabLoc);
+
+// Inverse Fourier Tranform Beam
+// -----------------------------
+beam<intensity> invFourierTransformBeam(beam<intensity> ERTab);
+
+// Calculate Centroid Shifts
+// -----------------------------
+void centroidShifts(GaussianBeam beam1, beam<intensity> outBeam, int dimset, double len);
+
+// Helper functions
+// ----------------
+intensity rTE(double n, double theta, vector<double> kvec);
+intensity rTM(double n, double theta, vector<double> kvec);
+double generateK(int index, int dimsize, int k, int xmax);
+double findMax(vector<double> vals);
+double chop(double num);
+int sign(double val);
 
 // Main
 // ====
-int main(int argc, char** argv){
+int main(){
     time_t start = clock();
     cout << "Starting Calculations" << endl;
 
@@ -47,6 +49,7 @@ int main(int argc, char** argv){
     GaussianBeam beam1(20000 , 1, 0, 0);
     beam1.calculateGaussData();
     int dimset = beam1.getDims();
+    double len = beam1.getLen();
 
     //Input three-component polarization vector (no need to normalize). Valid entries are:
     //Horizontal: {1,0,0}
@@ -62,8 +65,6 @@ int main(int argc, char** argv){
     double xKappa = findMax(beam1.getXVals());
     double yKappa = findMax(beam1.getYVals());
 
-
-
     // Fourier Tranform Beam
     beam<intensity> FourData = fourierTransformBeam(beam1, dimset, xKappa, yKappa);
 
@@ -74,13 +75,12 @@ int main(int argc, char** argv){
     beam<intensity> outBeam = invFourierTransformBeam(ERTab);
 
     // Calculate Centroid Shifts
-    centroidShifts(beam1, outBeam, dimset);
+    centroidShifts(beam1, outBeam, dimset, len);
 
     cout << "Total time elapsed: " << (clock() - start) / (double) CLOCKS_PER_SEC << " seconds." << endl;
 
     return 0;
 }
-
 
 // Fourier Tranform Beam
 // ---------------------
@@ -114,7 +114,7 @@ beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKap
             FourData.at(i).at(j).at(0) = fourEnt;
             // Remove evanescence
             if (pow(generateK(i, dimset, beam1.getK(), xKappa), 2) + pow(generateK(j, dimset, beam1.getK(), yKappa), 2) >= 1.0)
-                FourData.at(i).at(j).at(0) = (0,0);             
+                FourData.at(i).at(j).at(0) = (0,0);
             k++;
         }
     }
@@ -124,7 +124,7 @@ beam<intensity> fourierTransformBeam(GaussianBeam beam1, int dimset, double xKap
     fftw_free(out);
     fftw_destroy_plan(g);
 
-	// Recenter the Fourier data via 2D rotation
+    // Recenter the Fourier data via 2D rotation
     for (int i = 0; i < FourData.size(); i++) {
         for (int j = 0; j < (FourData.size() + 1) / 2; j++) {
             FourData.at(i).push_back(FourData.at(i).at(0));
@@ -174,22 +174,13 @@ beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double 
             ERTab.at(i).at(j).at(0) = eRTab.at(i).at(j).at(0) * fourPoint;
             ERTab.at(i).at(j).at(1) = eRTab.at(i).at(j).at(1) * fourPoint;
             ERTab.at(i).at(j).at(2) = eRTab.at(i).at(j).at(2) * fourPoint;
-
-            //Catch NaNs and set the corresponding points to 0
-            if (isnan(ERTab.at(i).at(j).at(0).real()) || isnan(ERTab.at(i).at(j).at(1).real()) || isnan(ERTab.at(i).at(j).at(2).real()) || isnan(ERTab.at(i).at(j).at(0).imag()) || isnan(ERTab.at(i).at(j).at(1).imag()) || isnan(ERTab.at(i).at(j).at(2).imag())){
-                cout << ++nanc << " NAN found: " << i << ", " << j << endl;
-                ERTab.at(i).at(j).at(0) = 0;
-                ERTab.at(i).at(j).at(1) = 0;
-                ERTab.at(i).at(j).at(2) = 0;
-            }
         }
     }
 
     return ERTab;
 }
 
-// Calculate eRTab
-// ...............
+// ### Calculate eRTab ###
 vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs){
     // Load various vectors for ERTab Calc
     vector<intensity> ERloc(3, intensity (0,0));
@@ -220,17 +211,11 @@ beam<intensity> invFourierTransformBeam(beam<intensity> ERTab){
     int k = 0;
     for (int i = 0; i < ERTab.size(); i++) {
         for (int j = 0; j < ERTab.at(0).size(); j++) {
-            in3[k][0] = real(ERTab.at(i).at(j).at(0));
-            in3[k][1] = -imag(ERTab.at(i).at(j).at(0));
-            k++;
-
-            in3[k][0] = real(ERTab.at(i).at(j).at(1));
-            in3[k][1] = -imag(ERTab.at(i).at(j).at(1));
-            k++;
-
-            in3[k][0] = real(ERTab.at(i).at(j).at(2));
-            in3[k][1] = -imag(ERTab.at(i).at(j).at(2));
-            k++;
+            for (int l = 0; l < 3; l++) {
+                in3[k][0] = real(ERTab.at(i).at(j).at(l));
+                in3[k][1] = -imag(ERTab.at(i).at(j).at(l));
+                k++;
+            }
         }
     }
 
@@ -244,20 +229,13 @@ beam<intensity> invFourierTransformBeam(beam<intensity> ERTab){
     k = 0;
     for (int i = 0; i < ERTab.size(); i++) {
         for (int j = 0; j < ERTab.at(0).size(); j++) {
-                vector<intensity> fourEnt;
-                intensity entry1(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
-                fourEnt.push_back(entry1);
+            vector<intensity> fourEnt;
+            for (int l = 0; l < 3; l++) {
+                intensity entry(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
+                fourEnt.push_back(entry);
                 k++;
-
-                intensity entry2(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
-                fourEnt.push_back(entry2);
-                k++;
-
-                intensity entry3(out3[k][0] / (ERTab.size()*sqrt(3)), out3[k][1] / (ERTab.size()*sqrt(3)));
-                fourEnt.push_back(entry3);
-                k++;
-
-                outBeam.at(i).at(j) = fourEnt;
+            }
+            outBeam.at(i).at(j) = fourEnt;
         }
     }
 
@@ -271,7 +249,7 @@ beam<intensity> invFourierTransformBeam(beam<intensity> ERTab){
 
 // Calculate Centroid Shifts
 // -------------------------
-void centroidShifts(GaussianBeam beam1, beam<intensity> outBeam, int dimset){
+void centroidShifts(GaussianBeam beam1, beam<intensity> outBeam, int dimset, double len){
     // Create magnitude vectors to account for real and imag
     beam<double> outBeamMag(outBeam.size(), vector2D<double>(outBeam.at(0).size(), vector<double>(1, 0)));
 
@@ -295,25 +273,23 @@ void centroidShifts(GaussianBeam beam1, beam<intensity> outBeam, int dimset){
 
     double nXr = nXrp1 / denom;
     double nYr = nYrp1 / denom;
-    double xShift = 2*400000/200*(nXr-(dimset+1)/2)/(2*PI/(632.8*pow(10, -9)))*pow(10,6);
+    double xShift = len / (dimset - 1) * (nXr - (dimset + 1) / 2) / (2 * PI/ (632.8 * pow(10, -9))) * pow(10,6);
 
     cout << "Calculated Centroid Shift (micrometers): " << xShift<< endl;
     return;
 }
 
-
 // Helper functions
 // ----------------
-intensity rTE(double n, double theta, vector<double> kvec) {
-    
-    //Parameters: refraction index n, incident angle theta (in degrees), Wave Vector
+intensity rTE(double n, double theta, vector<double> kvec){
+    // Parameters: refraction index n, incident angle theta (in degrees), Wave Vector
     theta *= PI / 180;
     vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
 
-    //Argument for beta: dot product between nvec and kvec
+    // Argument for beta: dot product between nvec and kvec
     double theDot = nvec.at(0)*kvec.at(0) + nvec.at(1)*kvec.at(1) + nvec.at(2)*kvec.at(2);
 
     double beta = acos(theDot);
@@ -323,38 +299,36 @@ intensity rTE(double n, double theta, vector<double> kvec) {
     return ans;
 }
 
-intensity rTM(double n, double theta, vector<double> kvec) {
+intensity rTM(double n, double theta, vector<double> kvec){
 
-    //Parameters: refraction index n, incident angle theta (in degrees), Wave Vector
+    // Parameters: refraction index n, incident angle theta (in degrees), Wave Vector
     theta *= PI / 180;
     vector<double> nvec;
     nvec.push_back(-sin(theta));
     nvec.push_back(0);
     nvec.push_back(cos(theta));
 
-    //Argument for beta: dot product between nvec and kvec
+    // Argument for beta: dot product between nvec and kvec
     double theDot = nvec.at(0)*kvec.at(0) + nvec.at(1)*kvec.at(1) + nvec.at(2)*kvec.at(2);
 
     double beta = acos(theDot);
     intensity arg(pow(n, 2) - pow(sin(beta), 2), 0);
     intensity ans = (pow(n,2)*cos(beta)-sqrt(arg))/(pow(n,2)*cos(beta)+sqrt(arg));
 
-
     return ans;
 }
 
-double generateK(int index, int dimsize, int k, int xmax) {
+double generateK(int index, int dimsize, int k, int xmax){
     return (2 * PI) / (2 * k*xmax)*(index-(dimsize+1)/2);
 }
 
-double findMax(vector<double> vals) {
+double findMax(vector<double> vals){
     double max = vals.at(0);
     for (int i = 1; i < vals.size(); i++) if (vals.at(i) >= max) max = vals.at(i);
     return max;
 }
 
-
-double chop(double num) {
+double chop(double num){
     if (abs(num) < 1e-12) return 0;
     return num;
 }

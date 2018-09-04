@@ -103,12 +103,11 @@ void GaussianBeam::calculateGaussData() {
     }
 }
 
-beam<intensityReal> GaussianBeam::getRealE() {
-    return ReEField;
-}
+double GaussianBeam::laguerre(unsigned int k, double alpha, coordinate x) {
+    if (k == 0) return 1;
+    if (k == 1) return 1 + alpha - x;
 
-beam<intensityImag> GaussianBeam::getImE() {
-    return ImEField;
+    return ((2 * k + 1 + alpha - x) * laguerre(k - 1, alpha, x) - (k + alpha) * laguerre(k - 2, alpha, x)) / (k + 1);
 }
 
 vector<coordinate> GaussianBeam::getXVals() {
@@ -123,15 +122,12 @@ double GaussianBeam::getK() {
     return k;
 }
 
-double GaussianBeam::laguerre(unsigned int k, double alpha, coordinate x) {
-    if (k == 0) return 1;
-    if (k == 1) return 1 + alpha - x;
-
-    return ((2 * k + 1 + alpha - x) * laguerre(k - 1, alpha, x) - (k + alpha) * laguerre(k - 2, alpha, x)) / (k + 1);
-}
-
 int GaussianBeam::getDims() {
     return dimset;
+}
+
+double GaussianBeam::getLen() {
+    return 2 * xMax;
 }
 
 double GaussianBeam::realEAt(int i, int j, int k) {

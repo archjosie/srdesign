@@ -28,6 +28,10 @@ const static double PI = 3.14159265;
 
 class GaussianBeam {
 
+// Comment
+// - I think some of the private functions here aren't defined in the .cpp,
+//   should be deleted if so. Maybe some of the public too, I haven't checked
+
 private:
     double w0, lambda, k, zR;
     unsigned int p, l;
@@ -41,32 +45,26 @@ private:
     beam<intensityImag> ImEField;
     vector<double> rVals, tVals, zVals, xVals, yVals;
 
-    double calculateWaist(double z);
+    static double distance(double x, double y);
     double calculateRadCurv(double z);
-    double calculateRayleigh();
     double calculateGouy(double z);
+    double calculateWaist(double z);
+    double calculateRayleigh();
     double calculateHermite(double x, unsigned int m);
+    double laguerre(unsigned int k, double alpha, double x);
 
 public:
-    // paramaterized constructor
+    // parameterized constructor
     GaussianBeam(double w0, double lambda, unsigned int m, unsigned int n);
     // default constructor
     GaussianBeam() : GaussianBeam(1, 20, 0, 0) {};
 
     void calculateGaussData();
-//    void fourierTran(beam<intensityReal> realPart, beam<intensityImag> imagPart, vector<double> xVals, vector<double> yVals, ofstream &fout);
-    static double distance(double x, double y);
-    void setRealE(beam<intensityReal> realE);
-    void setImE(beam<intensityImag> imE);
-    void setRealFour(beam<intensityReal> realFour);
-    void setImFour(beam<intensityImag> imFour);
-    beam<intensityReal> getRealE();
-    beam<intensityImag> getImE();
     vector<coordinate> getXVals();
     vector<coordinate> getYVals();
     double getK();
-    double laguerre(unsigned int k, double alpha, double x);
     int getDims();
+    double getLen();
     double realEAt(int i, int j, int k);
     double imagEAt(int i, int j, int k);
 };
