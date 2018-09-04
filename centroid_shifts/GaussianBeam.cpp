@@ -2,13 +2,13 @@
 
 using namespace std;
 
-GaussianBeam::GaussianBeam(double w0, double lambda, unsigned int p, unsigned int l) {
+GaussianBeam::GaussianBeam(double w0, double k, unsigned int p, unsigned int l) {
     this->w0 = w0;
-    this->lambda = lambda;
+    this->k = k;
     this->p = p;
     this->l = l;
 
-    this->k = 2 * PI / lambda;
+    this->lambda = 2 * PI / k;
     this->zR = calculateRayleigh();
 }
 
@@ -42,6 +42,7 @@ double GaussianBeam::calculateHermite(double x, unsigned int m) {
 }
 
 void GaussianBeam::calculateGaussData() {
+    // General vals that can be turned into real values
     dimset = 201;
     xMax = 400000;
     xMin = -xMax;
@@ -59,7 +60,7 @@ void GaussianBeam::calculateGaussData() {
         xVals.push_back(xCurr);
     }
 
-    // Populate rVals
+    // Populate yVals
     for (int i = 0; i < yRange; i++) {
         double yCurr = yMin + i*yInt;
         yVals.push_back(yCurr);
@@ -72,26 +73,26 @@ void GaussianBeam::calculateGaussData() {
 
     // Separate 3D vectors to hold real and imaginary parts of E-field
     beam<intensityReal> ReLocal(xVals.size(), vector2D<intensityReal>(yVals.size(), vector<intensityReal>(zVals.size(), 0)));
-
     ReEField = ReLocal;
     ImEField = ReLocal;
 
-    double omega = 20000 / k;
 
     for (int i = 0; i < xVals.size(); ++i) {
         for (int j = 0; j < yVals.size(); ++j) {
             coordinate r = distance(xVals.at(i), yVals.at(j));
 
-            intensityReal reArg = -pow(k, 2)*pow(r, 2) / (pow(omega*k, 2));
-            intensityImag imArg = 0;
+            // Calculate the real and imag arguments of exponential
+            double reArg = -pow(k, 2)*pow(r, 2) / (pow(w0*k, 2));
+            double imArg = 0;
+
             // get sign xval
             int sign = (xVals.at(i) > 0) - (xVals.at(i) < 0);
             if (abs(yVals.at(j)) < PI*1e-10) imArg = -l * (PI - sign * PI / 2);
             else imArg = -(l*atan(xVals.at(i) / yVals.at(j)));
 
-            // Uncomment if we only want to consider real component of field
+            // Calculate beam intensity at all points in lattice
             intensity phasorOut;
-            phasorOut = pow(2, l / 2)/ (omega * k) * exp(reArg) * k * pow(k / (omega * k * sqrt(1 / r)), l) * laguerre(p, l, 2 * pow(r, 2) * pow(k, 2) / (pow(omega*k, 2)));
+            phasorOut = pow(2, l / 2)/ (w0 * k) * exp(reArg) * k * pow(k / (w0 * k * sqrt(1 / r)), l) * laguerre(p, l, 2 * pow(r, 2) * pow(k, 2) / (pow(w0*k, 2)));
 
             intensityReal realField = real(phasorOut);
             intensityImag imagField = imag(phasorOut);
@@ -100,47 +101,6 @@ void GaussianBeam::calculateGaussData() {
             ImEField.at(i).at(j).at(0) = imagField;
         }
     }
-}
-
-void GaussianBeam::fourierTran(beam<intensityReal> realPart, beam<intensityImag> imagPart, vector<coordinate> xVals, vector<coordinate> yVals, ofstream &fout) {
-    fftw_complex *in, *out;
-    in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * realPart.size() * realPart.at(0).size());
-    out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * realPart.size() * realPart.at(0).size());
-
-    int k = 0;
-    for (int i = 0; i < realPart.size(); ++i) {
-        for (int j = 0; j < realPart.at(0).size(); ++j) {
-            in[k][0] = realPart.at(i).at(j).at(0);
-            in[k][1] = imagPart.at(i).at(j).at(0);
-            k++;
-        }
-    }
-
-    fftw_plan g = fftw_plan_dft_2d(realPart.size(), realPart.at(0).size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-    fftw_execute(g);
-
-    vector2D<intensityReal> realFour(realPart.size(), vector<intensityReal>(realPart.at(0).size()));
-    vector2D<intensityImag> imagFour(imagPart.size(), vector<intensityImag>(imagPart.at(0).size()));
-
-    k = 0;
-    for (int i = 0; i < realPart.size(); ++i) {
-        for (int j = 0; j < realPart.at(0).size(); ++j) {
-            realFour.at(i).at(j) = out[k][0];
-            imagFour.at(i).at(j) = out[k][1];
-            k++;
-        }
-    }
-
-    // Pound sign forces gnuplot to ignore line
-    // Write our 3D complex vector to file
-    fout << "# x " << '\t' << "y " << '\t' << "Re(E(x,y)) " << '\t' << "Im(E(x,y)) " << '\t' << "Abs(E(x,y))" << endl;
-    for (int i = 0; i < xVals.size(); ++i) {
-        for (int j = 0; j < yVals.size(); ++j) {
-                fout << xVals.at(i) << '\t' << yVals.at(j) << '\t' << realFour.at(i).at(j) << '\t' << imagFour.at(i).at(j)<< '\t' << distance(realFour.at(i).at(j), imagFour.at(i).at(j)) << endl;
-            }
-        }
-
-    cout << "Data output complete!" << endl;
 }
 
 beam<intensityReal> GaussianBeam::getRealE() {

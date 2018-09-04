@@ -54,7 +54,7 @@ public:
     GaussianBeam() : GaussianBeam(1, 20, 0, 0) {};
 
     void calculateGaussData();
-    void fourierTran(beam<intensityReal> realPart, beam<intensityImag> imagPart, vector<double> xVals, vector<double> yVals, ofstream &fout);
+//    void fourierTran(beam<intensityReal> realPart, beam<intensityImag> imagPart, vector<double> xVals, vector<double> yVals, ofstream &fout);
     static double distance(double x, double y);
     void setRealE(beam<intensityReal> realE);
     void setImE(beam<intensityImag> imE);
