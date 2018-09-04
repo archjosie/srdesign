@@ -19,9 +19,6 @@ beam<intensity> beamCalcs(GaussianBeam beam1, int dimset, double xKappa, double 
 // ### Calculate eRTab ###
 vector<intensity> eRBase (vector<intensity> f, double theta, vector<double> REkVecs);
 
-// ### Find NaN's and Set Them to Zero ###
-bool nanFinder (vector<intensity> ERTabLoc);
-
 // Inverse Fourier Tranform Beam
 // -----------------------------
 beam<intensity> invFourierTransformBeam(beam<intensity> ERTab);
