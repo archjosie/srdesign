@@ -7,4 +7,4 @@ with angular momentum incident on a reflective medium. The *background* folder
 holds relevent theory for the underlying calculations and explores the
 relationships between different froms of angular momentum.
 
-.. image:: background/fig.png
+.. figure:: background/fig.png
